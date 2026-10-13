@@ -1,0 +1,751 @@
+{
+  "@context": {
+    "@vocab": "https://gmicloud.ai/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "gmi": "https://gmicloud.ai/schema#",
+    "BaremetalReq": "gmi:BaremetalReq",
+    "count": {
+      "@id": "gmi:count",
+      "@type": "xsd:integer"
+    },
+    "enableZabbixAgent": {
+      "@id": "gmi:enableZabbixAgent",
+      "@type": "xsd:boolean"
+    },
+    "idc": {
+      "@id": "gmi:idc",
+      "@type": "@id"
+    },
+    "imageId": {
+      "@id": "gmi:imageId",
+      "@type": "xsd:string"
+    },
+    "internalIp": {
+      "@id": "gmi:internalIp",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "gmi:name",
+      "@type": "@id"
+    },
+    "product": {
+      "@id": "gmi:product",
+      "@type": "@id"
+    },
+    "sshKey": {
+      "@id": "gmi:sshKey",
+      "@type": "xsd:string"
+    },
+    "sshKeyIdList": {
+      "@id": "gmi:sshKeyIdList",
+      "@type": "@id"
+    },
+    "UuidObject": "gmi:UuidObject",
+    "id": {
+      "@id": "gmi:id",
+      "@type": "xsd:string"
+    },
+    "error": "gmi:error",
+    "code": {
+      "@id": "gmi:code",
+      "@type": "xsd:integer"
+    },
+    "reason": {
+      "@id": "gmi:reason",
+      "@type": "xsd:string"
+    },
+    "errorStatusMessage": "gmi:errorStatusMessage",
+    "group": {
+      "@id": "gmi:group",
+      "@type": "xsd:string"
+    },
+    "message": {
+      "@id": "gmi:message",
+      "@type": "xsd:string"
+    },
+    "traces": {
+      "@id": "gmi:traces",
+      "@container": "@list"
+    },
+    "validationDetail": {
+      "@id": "gmi:validationDetail",
+      "@container": "@list"
+    },
+    "productType": "gmi:productType",
+    "BaremetalResp": "gmi:BaremetalResp",
+    "associatedFirewalls": {
+      "@id": "gmi:associatedFirewalls",
+      "@type": "@id"
+    },
+    "consoleReady": {
+      "@id": "gmi:consoleReady",
+      "@type": "xsd:boolean"
+    },
+    "createdAt": {
+      "@id": "gmi:createdAt",
+      "@type": "xsd:dateTime"
+    },
+    "image": {
+      "@id": "gmi:image",
+      "@type": "xsd:string"
+    },
+    "networks": {
+      "@id": "gmi:networks",
+      "@container": "@list"
+    },
+    "orgId": {
+      "@id": "gmi:orgId",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "gmi:status",
+      "@type": "xsd:string"
+    },
+    "BaremetalNetworkAddr": "gmi:BaremetalNetworkAddr",
+    "ip": {
+      "@id": "gmi:ip",
+      "@type": "xsd:string"
+    },
+    "type": {
+      "@id": "gmi:type",
+      "@type": "xsd:string"
+    },
+    "containerConfig": "gmi:containerConfig",
+    "args": {
+      "@id": "gmi:args",
+      "@container": "@list"
+    },
+    "command": {
+      "@id": "gmi:command",
+      "@type": "xsd:string"
+    },
+    "envs": {
+      "@id": "gmi:envs",
+      "@container": "@list"
+    },
+    "ports": {
+      "@id": "gmi:ports",
+      "@container": "@list"
+    },
+    "templateId": {
+      "@id": "gmi:templateId",
+      "@type": "xsd:string"
+    },
+    "Env": "gmi:Env",
+    "value": {
+      "@id": "gmi:value",
+      "@type": "xsd:string"
+    },
+    "exposedPort": "gmi:exposedPort",
+    "containerPort": {
+      "@id": "gmi:containerPort",
+      "@type": "xsd:integer"
+    },
+    "port": {
+      "@id": "gmi:port",
+      "@type": "xsd:integer"
+    },
+    "protocol": {
+      "@id": "gmi:protocol",
+      "@type": "xsd:string"
+    },
+    "externalIP": "gmi:externalIP",
+    "ipAddress": {
+      "@id": "gmi:ipAddress",
+      "@type": "xsd:string"
+    },
+    "containerStatus": "gmi:containerStatus",
+    "Storage": "gmi:Storage",
+    "containerPath": {
+      "@id": "gmi:containerPath",
+      "@type": "xsd:string"
+    },
+    "elasticIPAllocateReq": "gmi:elasticIPAllocateReq",
+    "elasticIPAssociateConfig": "gmi:elasticIPAssociateConfig",
+    "instanceID": {
+      "@id": "gmi:instanceID",
+      "@type": "xsd:string"
+    },
+    "instanceType": {
+      "@id": "gmi:instanceType",
+      "@type": "@id"
+    },
+    "elasticIPConfig": "gmi:elasticIPConfig",
+    "internetConnectionType": {
+      "@id": "gmi:internetConnectionType",
+      "@type": "xsd:string"
+    },
+    "maxBandwidth": {
+      "@id": "gmi:maxBandwidth",
+      "@type": "xsd:string"
+    },
+    "FirewallUpdateReq": "gmi:FirewallUpdateReq",
+    "description": {
+      "@id": "gmi:description",
+      "@type": "xsd:string"
+    },
+    "inboundRules": {
+      "@id": "gmi:inboundRules",
+      "@type": "@id"
+    },
+    "FirewallRuleWithPortRange": "gmi:FirewallRuleWithPortRange",
+    "portRange": {
+      "@id": "gmi:portRange",
+      "@type": "@id"
+    },
+    "remoteIpPrefix": {
+      "@id": "gmi:remoteIpPrefix",
+      "@type": "@id"
+    },
+    "FirewallRuleWithoutPortRange": "gmi:FirewallRuleWithoutPortRange",
+    "ImageConfig": "gmi:ImageConfig",
+    "supportedProducts": {
+      "@id": "gmi:supportedProducts",
+      "@container": "@list"
+    },
+    "ImageBootMode": "gmi:ImageBootMode",
+    "partition": "gmi:partition",
+    "fileSystem": {
+      "@id": "gmi:fileSystem",
+      "@type": "xsd:string"
+    },
+    "mountPoint": {
+      "@id": "gmi:mountPoint",
+      "@type": "xsd:string"
+    },
+    "size": {
+      "@id": "gmi:size",
+      "@type": "xsd:string"
+    },
+    "template": "gmi:template",
+    "credential": {
+      "@id": "gmi:credential",
+      "@type": "@id"
+    },
+    "path": {
+      "@id": "gmi:path",
+      "@type": "@id"
+    },
+    "vpc": "gmi:vpc",
+    "subnets": {
+      "@id": "gmi:subnets",
+      "@container": "@list"
+    },
+    "vpcSubnet": "gmi:vpcSubnet",
+    "cidr": {
+      "@id": "gmi:cidr",
+      "@type": "xsd:string"
+    },
+    "listIDCsResponse": "gmi:listIDCsResponse",
+    "idcs": {
+      "@id": "gmi:idcs",
+      "@container": "@list"
+    },
+    "ErrStatusMsg": "gmi:ErrStatusMsg",
+    "idcInfo": "gmi:idcInfo",
+    "idcId": {
+      "@id": "gmi:idcId",
+      "@type": "xsd:string"
+    },
+    "country": {
+      "@id": "gmi:country",
+      "@type": "xsd:string"
+    },
+    "countrySubdivision": {
+      "@id": "gmi:countrySubdivision",
+      "@type": "xsd:string"
+    },
+    "ValidationDetail": "gmi:ValidationDetail",
+    "field": {
+      "@id": "gmi:field",
+      "@type": "xsd:string"
+    },
+    "expression": {
+      "@id": "gmi:expression",
+      "@type": "xsd:string"
+    },
+    "argument": {
+      "@id": "gmi:argument",
+      "@type": "xsd:string"
+    },
+    "originalValue": {
+      "@id": "gmi:originalValue"
+    },
+    "createOAuthAuthTokenRequest": "gmi:createOAuthAuthTokenRequest",
+    "provider": {
+      "@id": "gmi:provider",
+      "@type": "xsd:string"
+    },
+    "accessToken": {
+      "@id": "gmi:accessToken",
+      "@type": "xsd:string"
+    },
+    "createOAuthAuthTokenResponse": "gmi:createOAuthAuthTokenResponse",
+    "authToken": {
+      "@id": "gmi:authToken",
+      "@type": "xsd:string"
+    },
+    "createAuthTokenRequest": "gmi:createAuthTokenRequest",
+    "email": {
+      "@id": "gmi:email",
+      "@type": "xsd:string"
+    },
+    "password": {
+      "@id": "gmi:password",
+      "@type": "xsd:string"
+    },
+    "authTokenResponse": "gmi:authTokenResponse",
+    "is2FARequired": {
+      "@id": "gmi:is2FARequired",
+      "@type": "xsd:boolean"
+    },
+    "createSSHKeyRequest": "gmi:createSSHKeyRequest",
+    "createSSHKeyResponse": "gmi:createSSHKeyResponse",
+    "createSessionRequest": "gmi:createSessionRequest",
+    "otpCode": {
+      "@id": "gmi:otpCode",
+      "@type": "xsd:string"
+    },
+    "sessionResponse": "gmi:sessionResponse",
+    "refreshToken": {
+      "@id": "gmi:refreshToken",
+      "@type": "xsd:string"
+    },
+    "listSSHKeysResponse": "gmi:listSSHKeysResponse",
+    "keys": {
+      "@id": "gmi:keys",
+      "@container": "@list"
+    },
+    "sshKeyListItem": "gmi:sshKeyListItem",
+    "fingerprint": {
+      "@id": "gmi:fingerprint",
+      "@type": "xsd:string"
+    },
+    "refreshSessionRequest": "gmi:refreshSessionRequest",
+    "resend2FACodeRequest": "gmi:resend2FACodeRequest",
+    "getUserProfileResponse": "gmi:getUserProfileResponse",
+    "user": {
+      "@id": "gmi:user",
+      "@type": "@id"
+    },
+    "organization": {
+      "@id": "gmi:organization",
+      "@type": "@id"
+    },
+    "userProfileUserInfo": "gmi:userProfileUserInfo",
+    "firstName": {
+      "@id": "gmi:firstName",
+      "@type": "xsd:string"
+    },
+    "lastName": {
+      "@id": "gmi:lastName",
+      "@type": "xsd:string"
+    },
+    "lastLoginAt": {
+      "@id": "gmi:lastLoginAt",
+      "@type": "xsd:integer"
+    },
+    "lastLoginIDP": {
+      "@id": "gmi:lastLoginIDP",
+      "@type": "xsd:string"
+    },
+    "userProfileOrgInfo": "gmi:userProfileOrgInfo",
+    "role": {
+      "@id": "gmi:role",
+      "@type": "xsd:string"
+    },
+    "updateSSHKeyRequest": "gmi:updateSSHKeyRequest",
+    "updatePasswordRequest": "gmi:updatePasswordRequest",
+    "newPassword": {
+      "@id": "gmi:newPassword",
+      "@type": "xsd:string"
+    },
+    "currentPassword": {
+      "@id": "gmi:currentPassword",
+      "@type": "xsd:string"
+    },
+    "passwordResetToken": {
+      "@id": "gmi:passwordResetToken",
+      "@type": "xsd:string"
+    },
+    "updateProfileRequest": "gmi:updateProfileRequest",
+    "verifyAPIKeyResponse": "gmi:verifyAPIKeyResponse",
+    "key": {
+      "@id": "gmi:key",
+      "@type": "@id"
+    },
+    "apiKeyInfo": "gmi:apiKeyInfo",
+    "scope": {
+      "@id": "gmi:scope",
+      "@type": "xsd:string"
+    },
+    "owner": {
+      "@id": "gmi:owner",
+      "@type": "@id"
+    },
+    "apiKeyOrgInfo": "gmi:apiKeyOrgInfo",
+    "apiKeyOwnerInfo": "gmi:apiKeyOwnerInfo",
+    "exchangeAuthorizationCodeRequest": "gmi:exchangeAuthorizationCodeRequest",
+    "exchangeAuthorizationCodeResponse": "gmi:exchangeAuthorizationCodeResponse",
+    "createApiKeyRequest": "gmi:createApiKeyRequest",
+    "expiresAt": {
+      "@id": "gmi:expiresAt",
+      "@type": "xsd:integer"
+    },
+    "createApiKeyResponse": "gmi:createApiKeyResponse",
+    "listApiKeysResponse": "gmi:listApiKeysResponse",
+    "apiKeyListItem": "gmi:apiKeyListItem",
+    "partialKey": {
+      "@id": "gmi:partialKey",
+      "@type": "xsd:string"
+    },
+    "apiKeyListOwnerInfo": "gmi:apiKeyListOwnerInfo",
+    "listUsersByOrganizationResponse": "gmi:listUsersByOrganizationResponse",
+    "users": {
+      "@id": "gmi:users",
+      "@container": "@list"
+    },
+    "userInOrganization": "gmi:userInOrganization",
+    "orgRole": {
+      "@id": "gmi:orgRole",
+      "@type": "xsd:string"
+    },
+    "registerOrganizationRequest": "gmi:registerOrganizationRequest",
+    "registerOrganizationResponse": "gmi:registerOrganizationResponse",
+    "getOrganizationInfoResponse": "gmi:getOrganizationInfoResponse",
+    "sendInvitationsEmailRequest": "gmi:sendInvitationsEmailRequest",
+    "invitees": {
+      "@id": "gmi:invitees",
+      "@container": "@list"
+    },
+    "inviteeInfo": "gmi:inviteeInfo",
+    "transferOrganizationOwnerRequest": "gmi:transferOrganizationOwnerRequest",
+    "newOwnerId": {
+      "@id": "gmi:newOwnerId",
+      "@type": "xsd:string"
+    },
+    "updateOrganizationInfoRequest": "gmi:updateOrganizationInfoRequest",
+    "passwordResetRequest": "gmi:passwordResetRequest",
+    "resendEmailVerificationCodeResponse": "gmi:resendEmailVerificationCodeResponse",
+    "emailVerificationToken": {
+      "@id": "gmi:emailVerificationToken",
+      "@type": "xsd:string"
+    },
+    "emailVerificationRequest": "gmi:emailVerificationRequest",
+    "emailVerificationResponse": "gmi:emailVerificationResponse",
+    "SandboxExecResultResponse": "gmi:SandboxExecResultResponse",
+    "request_id": {
+      "@id": "gmi:request_id",
+      "@type": "xsd:string"
+    },
+    "execution_id": {
+      "@id": "gmi:execution_id",
+      "@type": "xsd:string"
+    },
+    "sandbox_id": {
+      "@id": "gmi:sandbox_id",
+      "@type": "xsd:string"
+    },
+    "exit_code": {
+      "@id": "gmi:exit_code",
+      "@type": "xsd:integer"
+    },
+    "stdout": {
+      "@id": "gmi:stdout",
+      "@type": "xsd:string"
+    },
+    "stderr": {
+      "@id": "gmi:stderr",
+      "@type": "xsd:string"
+    },
+    "stdout_truncated": {
+      "@id": "gmi:stdout_truncated",
+      "@type": "xsd:boolean"
+    },
+    "stderr_truncated": {
+      "@id": "gmi:stderr_truncated",
+      "@type": "xsd:boolean"
+    },
+    "started_at": {
+      "@id": "gmi:started_at",
+      "@type": "xsd:dateTime"
+    },
+    "completed_at": {
+      "@id": "gmi:completed_at",
+      "@type": "xsd:dateTime"
+    },
+    "SandboxExecAcceptedResponse": "gmi:SandboxExecAcceptedResponse",
+    "SandboxExecStatus": "gmi:SandboxExecStatus",
+    "SandboxExecErrorResponse": "gmi:SandboxExecErrorResponse",
+    "details": {
+      "@id": "gmi:details"
+    },
+    "SandboxExecRequest": "gmi:SandboxExecRequest",
+    "action": {
+      "@id": "gmi:action",
+      "@type": "xsd:string"
+    },
+    "parameters": {
+      "@id": "gmi:parameters"
+    },
+    "SandboxFileError": "gmi:SandboxFileError",
+    "SandboxFileEntry": "gmi:SandboxFileEntry",
+    "ConnectSandboxControlRequest": "gmi:ConnectSandboxControlRequest",
+    "timeout": {
+      "@id": "gmi:timeout",
+      "@type": "xsd:integer"
+    },
+    "ConnectSandboxControlResponse": "gmi:ConnectSandboxControlResponse",
+    "data": {
+      "@id": "gmi:data",
+      "@type": "@id"
+    },
+    "ConnectSandboxControlResult": "gmi:ConnectSandboxControlResult",
+    "sandbox_key": {
+      "@id": "gmi:sandbox_key",
+      "@type": "xsd:string"
+    },
+    "template_id": {
+      "@id": "gmi:template_id",
+      "@type": "xsd:string"
+    },
+    "domain": {
+      "@id": "gmi:domain",
+      "@type": "xsd:string"
+    },
+    "sandbox_access_token": {
+      "@id": "gmi:sandbox_access_token",
+      "@type": "xsd:string"
+    },
+    "traffic_access_token": {
+      "@id": "gmi:traffic_access_token",
+      "@type": "xsd:string"
+    },
+    "end_at": {
+      "@id": "gmi:end_at",
+      "@type": "xsd:dateTime"
+    },
+    "ErrorResponse": "gmi:ErrorResponse",
+    "CreateSandboxControlRequest": "gmi:CreateSandboxControlRequest",
+    "idc_name": {
+      "@id": "gmi:idc_name",
+      "@type": "xsd:string"
+    },
+    "env_vars": {
+      "@id": "gmi:env_vars"
+    },
+    "metadata": {
+      "@id": "gmi:metadata"
+    },
+    "CreateSandboxControlResponse": "gmi:CreateSandboxControlResponse",
+    "CreateSandboxControlResult": "gmi:CreateSandboxControlResult",
+    "SandboxDeleteAcceptedResponse": "gmi:SandboxDeleteAcceptedResponse",
+    "SandboxControlDetailResponse": "gmi:SandboxControlDetailResponse",
+    "SandboxControlDetail": "gmi:SandboxControlDetail",
+    "state": {
+      "@id": "gmi:state",
+      "@type": "@id"
+    },
+    "product_name": {
+      "@id": "gmi:product_name",
+      "@type": "xsd:string"
+    },
+    "resources": {
+      "@id": "gmi:resources",
+      "@type": "@id"
+    },
+    "latest_operation": {
+      "@id": "gmi:latest_operation",
+      "@type": "@id"
+    },
+    "failure": {
+      "@id": "gmi:failure",
+      "@type": "@id"
+    },
+    "created_at": {
+      "@id": "gmi:created_at",
+      "@type": "xsd:string"
+    },
+    "running_at": {
+      "@id": "gmi:running_at",
+      "@type": "xsd:string"
+    },
+    "SandboxControlState": "gmi:SandboxControlState",
+    "SandboxResources": "gmi:SandboxResources",
+    "vcpu": {
+      "@id": "gmi:vcpu",
+      "@type": "xsd:integer"
+    },
+    "memory_mb": {
+      "@id": "gmi:memory_mb",
+      "@type": "xsd:integer"
+    },
+    "disk_mb": {
+      "@id": "gmi:disk_mb",
+      "@type": "xsd:integer"
+    },
+    "SandboxMutationResult": "gmi:SandboxMutationResult",
+    "error_code": {
+      "@id": "gmi:error_code",
+      "@type": "xsd:string"
+    },
+    "SandboxFailure": "gmi:SandboxFailure",
+    "occurred_at": {
+      "@id": "gmi:occurred_at",
+      "@type": "xsd:string"
+    },
+    "ListSandboxesControlResponse": "gmi:ListSandboxesControlResponse",
+    "total": {
+      "@id": "gmi:total",
+      "@type": "xsd:integer"
+    },
+    "page": {
+      "@id": "gmi:page",
+      "@type": "xsd:integer"
+    },
+    "page_size": {
+      "@id": "gmi:page_size",
+      "@type": "xsd:integer"
+    },
+    "items": {
+      "@id": "gmi:items",
+      "@container": "@list"
+    },
+    "SandboxControlSummary": "gmi:SandboxControlSummary",
+    "SetSandboxControlTimeoutRequest": "gmi:SetSandboxControlTimeoutRequest",
+    "SetSandboxControlTimeoutResponse": "gmi:SetSandboxControlTimeoutResponse",
+    "UpdateSandboxControlRequest": "gmi:UpdateSandboxControlRequest",
+    "CreateTemplateRequest": "gmi:CreateTemplateRequest",
+    "labels": {
+      "@id": "gmi:labels"
+    },
+    "build": {
+      "@id": "gmi:build"
+    },
+    "TemplateMutationAccepted": "gmi:TemplateMutationAccepted",
+    "BuildDefinition": "gmi:BuildDefinition",
+    "source": {
+      "@id": "gmi:source",
+      "@type": "@id"
+    },
+    "commands": {
+      "@id": "gmi:commands",
+      "@container": "@list"
+    },
+    "start_cmd": {
+      "@id": "gmi:start_cmd",
+      "@type": "xsd:string"
+    },
+    "BuildStatus": "gmi:BuildStatus",
+    "PresetResourceSelection": "gmi:PresetResourceSelection",
+    "CustomResourceSelection": "gmi:CustomResourceSelection",
+    "cpu_count": {
+      "@id": "gmi:cpu_count",
+      "@type": "xsd:integer"
+    },
+    "disk_size_mb": {
+      "@id": "gmi:disk_size_mb",
+      "@type": "xsd:integer"
+    },
+    "architecture": {
+      "@id": "gmi:architecture",
+      "@type": "xsd:string"
+    },
+    "ImageSource": "gmi:ImageSource",
+    "TemplateSource": "gmi:TemplateSource",
+    "build_id": {
+      "@id": "gmi:build_id",
+      "@type": "xsd:string"
+    },
+    "TemplateBuildMutation": "gmi:TemplateBuildMutation",
+    "TemplateDeletionAccepted": "gmi:TemplateDeletionAccepted",
+    "TemplateBuildResponse": "gmi:TemplateBuildResponse",
+    "TemplateBuild": "gmi:TemplateBuild",
+    "trigger": {
+      "@id": "gmi:trigger",
+      "@type": "@id"
+    },
+    "artifact_state": {
+      "@id": "gmi:artifact_state",
+      "@type": "@id"
+    },
+    "source_type": {
+      "@id": "gmi:source_type",
+      "@type": "@id"
+    },
+    "finished_at": {
+      "@id": "gmi:finished_at",
+      "@type": "xsd:dateTime"
+    },
+    "BuildTrigger": "gmi:BuildTrigger",
+    "ArtifactState": "gmi:ArtifactState",
+    "BuildSourceType": "gmi:BuildSourceType",
+    "EffectiveResources": "gmi:EffectiveResources",
+    "ResourceSpecName": "gmi:ResourceSpecName",
+    "BuildFailure": "gmi:BuildFailure",
+    "TemplateResponse": "gmi:TemplateResponse",
+    "Template": "gmi:Template",
+    "current_build_id": {
+      "@id": "gmi:current_build_id",
+      "@type": "xsd:string"
+    },
+    "latest_build_id": {
+      "@id": "gmi:latest_build_id",
+      "@type": "xsd:string"
+    },
+    "latest_build_status": {
+      "@id": "gmi:latest_build_status",
+      "@type": "@id"
+    },
+    "rebuildable": {
+      "@id": "gmi:rebuildable",
+      "@type": "xsd:boolean"
+    },
+    "deleted_at": {
+      "@id": "gmi:deleted_at",
+      "@type": "xsd:dateTime"
+    },
+    "updated_at": {
+      "@id": "gmi:updated_at",
+      "@type": "xsd:dateTime"
+    },
+    "BuildLogPageResponse": "gmi:BuildLogPageResponse",
+    "BuildLogPage": "gmi:BuildLogPage",
+    "entries": {
+      "@id": "gmi:entries",
+      "@container": "@list"
+    },
+    "next_offset": {
+      "@id": "gmi:next_offset",
+      "@type": "xsd:integer"
+    },
+    "has_more": {
+      "@id": "gmi:has_more",
+      "@type": "xsd:boolean"
+    },
+    "BuildLogEntry": "gmi:BuildLogEntry",
+    "offset": {
+      "@id": "gmi:offset",
+      "@type": "xsd:integer"
+    },
+    "timestamp": {
+      "@id": "gmi:timestamp",
+      "@type": "xsd:dateTime"
+    },
+    "level": {
+      "@id": "gmi:level",
+      "@type": "xsd:string"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "GMI Cloud API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects GMI Cloud's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-13) from openapi/gmi-cloud-cluster-engine-openapi.yml, openapi/gmi-cloud-idc-service-openapi.yml, openapi/gmi-cloud-sandbox-openapi.yml.",
+  "dcterms:created": "2026-10-13",
+  "dcterms:source": [
+    "openapi/gmi-cloud-cluster-engine-openapi.yml",
+    "openapi/gmi-cloud-idc-service-openapi.yml",
+    "openapi/gmi-cloud-sandbox-openapi.yml"
+  ]
+}

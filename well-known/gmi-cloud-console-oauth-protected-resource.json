@@ -1,0 +1,1 @@
+{"resource":"https://mcp.gmicloud.ai/mcp","authorization_servers":["https://mcp.gmicloud.ai"],"scopes_supported":["models:read","generation:read","billing:read","profile:read","generation:write","support:write"],"bearer_methods_supported":["header"]}

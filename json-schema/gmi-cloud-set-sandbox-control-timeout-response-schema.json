@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json",
+  "title": "SetSandboxControlTimeoutResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-sandbox-openapi.yml#/components/schemas/SetSandboxControlTimeoutResponse",
+  "type": "object",
+  "required": [
+    "request_id",
+    "data"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Request tracing ID"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "id",
+        "old_end_at",
+        "new_end_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique sandbox resource ID."
+        },
+        "old_end_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The expiry time (UTC) before this change."
+        },
+        "new_end_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The expiry time (UTC) in effect after this change. When a `timeout` of 0 or less is replaced by the default duration, this field is authoritative.\n"
+        }
+      }
+    }
+  }
+}

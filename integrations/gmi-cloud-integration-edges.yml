@@ -1,0 +1,16 @@
+generated: '2026-10-13'
+method: none
+source:
+- https://zapier.com/apps/gmi-cloud/integrations
+- https://n8n.io/integrations/gmi-cloud/
+- https://composio.dev/toolkits/gmi-cloud
+- https://monid.ai/tools/gmi-cloud
+checked:
+- https://composio.dev/toolkits/gmi-cloud
+- https://monid.ai/tools/gmi-cloud
+- https://n8n.io/integrations/gmi-cloud/
+- https://zapier.com/apps/gmi-cloud/integrations
+summary: null
+marketplace_apps: []
+edges: []
+templates: []

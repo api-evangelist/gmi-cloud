@@ -1,0 +1,13 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-conformance.py
+source: openapi/ (3 document(s), 60 mutating operations)
+idempotency:
+  coverage: partial
+  header: Idempotency-Key
+  mechanism: request header / body token declared in the OpenAPI
+  evidence: Idempotency-Key on 2 of 60 mutating operations
+  verified: derived
+  scope:
+  - POST /sandboxes (Create a sandbox)
+  - POST template create-and-build (Create a Template and start its initial Build)

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-build-definition-schema.json",
+  "title": "BuildDefinition",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-sandbox-openapi.yml#/components/schemas/BuildDefinition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source"
+  ],
+  "properties": {
+    "source": {
+      "$ref": "#/$defs/BuildSource"
+    },
+    "commands": {
+      "type": "array",
+      "maxItems": 100,
+      "description": "Shell command strings executed sequentially during the Build.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 8192
+      }
+    },
+    "envs": {
+      "type": "object",
+      "maxProperties": 256,
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 32768
+      },
+      "description": "Environment variables available only during the Template Build.\nThey are visible to subsequent build commands/steps and are not persisted\ninto the resulting template artifact as sandbox runtime environment\nvariables. Pass runtime env when creating a Sandbox instead. Write-only:\nvalues are never returned on Template or TemplateBuild responses.\nKeys must be unique (JSON object); the server orders them\ndeterministically by key. Key names must match\n`[A-Za-z_][A-Za-z0-9_]*`.\n"
+    },
+    "start_cmd": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192,
+      "description": "Launch command persisted with the Build and applied when Sandboxes\ncreated from this Template start.\n"
+    }
+  },
+  "$defs": {
+    "BuildSource": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ImageSource"
+        },
+        {
+          "$ref": "#/$defs/TemplateSource"
+        }
+      ],
+      "description": "Manual Build source. Sandbox sources use the snapshot endpoint."
+    },
+    "ImageSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "image"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "image"
+          ]
+        },
+        "image": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Debian or Ubuntu container image reference. The server validates\nthe image against the IDC-supported base OS policy.\n"
+        }
+      }
+    },
+    "TemplateSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "template_id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "template"
+          ]
+        },
+        "template_id": {
+          "type": "string",
+          "description": "Parent GMI Template identifier in the same IDC."
+        },
+        "build_id": {
+          "type": "string",
+          "description": "Optional parent Build identifier. When omitted, the parent's\ncurrent successful Build is used.\n"
+        }
+      }
+    }
+  }
+}

@@ -1,23 +1,177 @@
 aid: gmi-cloud
 name: GMI Cloud
-description: 'GMI Cloud is a company surfaced via the API Evangelist harvest backlog (source: market-gap:ai-model-routing)
-  and added to the network as a stub for full-pipeline profiling.'
+image: https://www.gmicloud.ai/_next/static/media/gmi-cloud.0t7b2ghyy4szj.png
+description: GMI Cloud is a GPU cloud and AI inference provider offering the Inference
+  Engine (OpenAI-compatible LLM, image and video model APIs at api.gmi-serving.com),
+  the Cluster Engine for GPU containers, bare-metal and VPC infrastructure, and GMI
+  Sandbox for isolated code execution. Its control-plane APIs are served from console.gmicloud.ai
+  and documented at docs.gmicloud.ai.
 url: https://raw.githubusercontent.com/api-evangelist/gmi-cloud/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:market-gap:ai-model-routing
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-10-13 (local-v5; was harvest)
 specificationVersion: '0.20'
 created: '2026-10-13'
 modified: '2026-10-13'
 tags:
 - Company
-apis: []
+- AI
+- Inference
+- GPU Cloud
+- LLM
+- Model Routing
+- Sandboxes
+- Infrastructure
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/gmi-cloud-agentic-access.yml
+- type: RateLimits
+  url: rate-limits/gmi-cloud-rate-limits.yml
+- type: Spectral
+  url: rules/gmi-cloud-rules.yml
+- type: JSONLD
+  url: json-ld/gmi-cloud-context.jsonld
+- type: Vocabulary
+  url: vocabulary/gmi-cloud-vocabulary.yml
+- type: DataModel
+  url: data-model/gmi-cloud-data-model.yml
+- type: Idempotency
+  url: conventions/gmi-cloud-conventions.yml
+- type: Conventions
+  url: conventions/gmi-cloud-conventions.yml
+- type: ErrorCatalog
+  url: errors/gmi-cloud-problem-types.yml
+- type: Conformance
+  url: conformance/gmi-cloud-conformance.yml
+- type: LLMsTxt
+  url: llms/gmi-cloud-llms.txt
+- type: AgentCard
+  url: a2a/gmi-cloud-a2a.yml
+- type: MCPServer
+  url: mcp/gmi-cloud-mcp.yml
+- type: WellKnown
+  url: well-known/gmi-cloud-well-known.yml
+- type: Hosts
+  url: hosts/gmi-cloud-hosts.yml
+- type: Vendors
+  url: vendors/gmi-cloud-vendors.yml
+- type: SDKs
+  url: packages/gmi-cloud-packages.yml
+- type: Packages
+  url: packages/gmi-cloud-packages.yml
+- type: Authentication
+  url: authentication/gmi-cloud-authentication.yml
+- type: DomainSecurity
+  url: security/gmi-cloud-domain-security.yml
 - type: Website
   url: https://www.gmicloud.ai
+- type: DeveloperPortal
+  url: https://www.gmicloud.ai/en/developers
+- type: Documentation
+  url: https://docs.gmicloud.ai/
+- type: APIReference
+  url: https://docs.gmicloud.ai/api-reference/introduction
+- type: GettingStarted
+  url: https://docs.gmicloud.ai/quickstart
+- type: Blog
+  url: https://www.gmicloud.ai/en/blog
+- type: GitHubOrganization
+  url: https://github.com/GMISWE
+- type: Pricing
+  url: https://www.gmicloud.ai/en/pricing
+- type: TermsOfService
+  url: https://www.gmicloud.ai/en/terms-and-conditions
+- type: PrivacyPolicy
+  url: https://www.gmicloud.ai/en/privacy-policy
+- type: Login
+  url: https://console.gmicloud.ai/
+apis:
+- aid: gmi-cloud:cluster-engine-api
+  name: GMI Cloud Cluster Engine API
+  description: Manage users, organizations, API keys, SSH keys, containers and cluster
+    resources on GMI Cloud.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - GMI Cloud
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-cluster-engine-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+- aid: gmi-cloud:idc-service-api
+  name: GMI Cloud IDC Service API
+  description: Bare-metal instances, VPCs, elastic IPs and related infrastructure
+    in GMI Cloud data centers.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api/v1
+  tags:
+  - GMI Cloud
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-idc-service-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+- aid: gmi-cloud:sandbox-api
+  name: GMI Sandbox API
+  description: Create, connect to, execute commands in and manage files of isolated
+    sandboxes and their templates/builds.
+  humanURL: https://docs.gmicloud.ai/api-reference/sandbox/overview
+  baseURL: https://console.gmicloud.ai/api/v2
+  tags:
+  - GMI Cloud
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-sandbox-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:inference-api
+  name: GMI Cloud Inference Engine API
+  description: OpenAI-compatible inference endpoints (GET /v1/models, POST /v1/chat/completions)
+    plus video inference; no machine-readable contract published.
+  humanURL: https://docs.gmicloud.ai/inference-engine/api-reference/llm-api-reference
+  baseURL: https://api.gmi-serving.com/v1
+  tags:
+  - GMI Cloud
+  properties: []
+x-enrichment:
+  date: '2026-10-13'
+  status: enriched
+  artifacts_added: 23
+  pass: local-v5

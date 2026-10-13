@@ -1,0 +1,33 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.gmicloud.ai/inference-engine/api-reference/rate-limit.md
+name: GMI Cloud Inference API rate limits
+description: 'Organization-level limits: TPM for LLM models, RPH for video models
+  (RPH values not published). Tiers auto-upgrade on credit purchase: Tier 2 $50, Tier
+  3 $500, Tier 4 $1000; 429 on excess.'
+limits:
+- name: Tier 1 TPM (all models)
+  window: 1 minute
+  max: 1000000
+  scope: organization
+  unit: tokens
+- name: Tier 2 TPM (all models)
+  window: 1 minute
+  max: 3000000
+  scope: organization
+  unit: tokens
+- name: Tier 3 TPM (all models)
+  window: 1 minute
+  max: 50000000
+  scope: organization
+  unit: tokens
+- name: Tier 4 TPM (all models)
+  window: 1 minute
+  max: 100000000
+  scope: organization
+  unit: tokens
+- name: Tier 5 TPM (all models)
+  window: 1 minute
+  max: 300000000
+  scope: organization
+  unit: tokens

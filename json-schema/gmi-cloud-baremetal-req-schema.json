@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-baremetal-req-schema.json",
+  "title": "BaremetalReq",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-cluster-engine-openapi.yml#/components/schemas/BaremetalReq",
+  "properties": {
+    "count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "enableZabbixAgent": {
+      "default": true,
+      "description": "Whether to enable Zabbix agent on the baremetal node",
+      "type": "boolean"
+    },
+    "idc": {
+      "$ref": "#/$defs/idcName"
+    },
+    "imageId": {
+      "description": "The ID of the image to use for creating the baremetal instance",
+      "format": "uuid",
+      "type": "string"
+    },
+    "internalIp": {
+      "description": "Manually allocate internal IP address(IPv4 only). If not provided, internal IP will be allocated automatically. It only supports single baremetal creation.",
+      "maxLength": 15,
+      "minLength": 7,
+      "type": "string"
+    },
+    "name": {
+      "$ref": "#/$defs/name"
+    },
+    "product": {
+      "$ref": "#/$defs/productName"
+    },
+    "sshKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sshKeyIdList": {
+      "$ref": "#/$defs/UuidList",
+      "description": "The list of SSH key IDs to use for creating the baremetal instance"
+    }
+  },
+  "required": [
+    "idc",
+    "product",
+    "name",
+    "count",
+    "imageId"
+  ],
+  "type": "object",
+  "$defs": {
+    "UuidList": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "idcName": {
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 255,
+      "pattern": "^([A-Za-z0-9][A-Za-z0-9_\\-. ]*)?[A-Za-z0-9]$",
+      "type": "string"
+    },
+    "productName": {
+      "maxLength": 256,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    }
+  }
+}

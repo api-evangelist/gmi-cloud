@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json",
+  "title": "createOAuthAuthTokenRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-idc-service-openapi.yml#/components/schemas/createOAuthAuthTokenRequest",
+  "type": "object",
+  "x-go-name": "createOAuthAuthTokenRequest",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "description": "The authentication provider used for login.\n- \"google\": User logs in with Google OAuth.\n- \"github\": User logs in with Github OAuth.\n- \"hugging_face\": User logs in with Hugging Face OAuth.\n",
+      "enum": [
+        "google",
+        "github",
+        "hugging_face"
+      ],
+      "x-go-type": "iamLibTypes.OAuthProvider",
+      "x-go-type-import": {
+        "path": "us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/iam-lib-go/pkg/types",
+        "name": "iamLibTypes"
+      },
+      "x-oapi-codegen-extra-tags": {
+        "binding": "required"
+      }
+    },
+    "accessToken": {
+      "type": "string",
+      "description": "OAuth access token (e.g., Google).",
+      "x-oapi-codegen-extra-tags": {
+        "binding": "required"
+      }
+    }
+  },
+  "required": [
+    "provider",
+    "accessToken"
+  ]
+}

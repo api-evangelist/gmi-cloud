@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-update-template-request-schema.json",
+  "title": "UpdateTemplateRequest",
+  "description": "GMI-owned Template metadata patch. Omitted fields are left unchanged;\n`labels` replaces the stored map wholesale when provided.\n",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-sandbox-openapi.yml#/components/schemas/UpdateTemplateRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "minProperties": 1,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "description": "New organization-scoped display name."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "New human-readable description."
+    },
+    "labels": {
+      "type": "object",
+      "maxProperties": 64,
+      "description": "Complete replacement of user-defined labels.",
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 256
+      }
+    }
+  }
+}

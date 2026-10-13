@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-create-api-key-request-schema.json",
+  "title": "createApiKeyRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-idc-service-openapi.yml#/components/schemas/createApiKeyRequest",
+  "type": "object",
+  "x-go-name": "createApiKeyRequest",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The API key name.",
+      "x-oapi-codegen-extra-tags": {
+        "binding": "required"
+      }
+    },
+    "scope": {
+      "type": "string",
+      "description": "The API key scope. Default value is `ie_model`.",
+      "enum": [
+        "ie_model",
+        "ce_resource"
+      ],
+      "x-go-type": "ceCommonLibTypes.IasAPIKeyScope",
+      "x-go-type-import": {
+        "path": "us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/ce-common-lib-go/pkg/types",
+        "name": "ceCommonLibTypes"
+      },
+      "x-go-type-skip-optional-pointer": true,
+      "x-oapi-codegen-extra-tags": {
+        "binding": "omitempty,oneof=ie_model ce_resource",
+        "default": "ie_model"
+      }
+    },
+    "expiresAt": {
+      "type": "integer",
+      "x-go-type": "int64",
+      "description": "The UNIX timestamp when API key will expire (UTC).\n- Must be a UNIX timestamp in seconds and must be greater than the current time.\n- If not set, the key will not expire.\n",
+      "x-oapi-codegen-extra-tags": {
+        "binding": "omitempty,expirationTime"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

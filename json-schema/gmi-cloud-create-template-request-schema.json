@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-create-template-request-schema.json",
+  "title": "CreateTemplateRequest",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-sandbox-openapi.yml#/components/schemas/CreateTemplateRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "resources"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "description": "Organization-scoped Template display name."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "Human-readable Template description."
+    },
+    "idc_name": {
+      "type": "string",
+      "description": "IDC that permanently owns the Template. Optional: omitted, empty, and whitespace-only values are equivalent — the organization's configured default data center is used (maintained by the platform administrator; the same setting used by sandbox creation). If the organization has no default configured, the request returns 400.\n"
+    },
+    "resources": {
+      "$ref": "#/$defs/ResourceSelection"
+    },
+    "labels": {
+      "type": "object",
+      "maxProperties": 64,
+      "description": "User-defined labels used for filtering.",
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 256
+      }
+    },
+    "build": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/BuildDefinition"
+        }
+      ],
+      "description": "Initial Build definition created and started with the Template\n(combined flow, every IDC supports it). Omitting `build` selects the\nsplit flow: the Template and a `waiting` initial Build are created\nwithout starting anything, and the Build is started later via\n`POST /templates/{template_id}/builds/{id}`. The split flow is not\nsupported in every IDC; unsupported IDCs reject it with 422.\n"
+    }
+  },
+  "$defs": {
+    "BuildDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/BuildSource"
+        },
+        "commands": {
+          "type": "array",
+          "maxItems": 100,
+          "description": "Shell command strings executed sequentially during the Build.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          }
+        },
+        "envs": {
+          "type": "object",
+          "maxProperties": 256,
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 32768
+          },
+          "description": "Environment variables available only during the Template Build.\nThey are visible to subsequent build commands/steps and are not persisted\ninto the resulting template artifact as sandbox runtime environment\nvariables. Pass runtime env when creating a Sandbox instead. Write-only:\nvalues are never returned on Template or TemplateBuild responses.\nKeys must be unique (JSON object); the server orders them\ndeterministically by key. Key names must match\n`[A-Za-z_][A-Za-z0-9_]*`.\n"
+        },
+        "start_cmd": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "description": "Launch command persisted with the Build and applied when Sandboxes\ncreated from this Template start.\n"
+        }
+      }
+    },
+    "BuildSource": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ImageSource"
+        },
+        {
+          "$ref": "#/$defs/TemplateSource"
+        }
+      ],
+      "description": "Manual Build source. Sandbox sources use the snapshot endpoint."
+    },
+    "CustomResourceSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "cpu_count",
+        "memory_mb",
+        "disk_size_mb"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "custom"
+          ]
+        },
+        "cpu_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "description": "Requested integer vCPU count. Custom resources allow at most\n16 vCPU.\n"
+        },
+        "memory_mb": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536,
+          "description": "Requested integer memory size in MiB. Custom resources allow at\nmost 65536 MiB (64 GiB).\n"
+        },
+        "disk_size_mb": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536,
+          "description": "Requested integer boot disk size in MiB. Custom resources allow at\nmost 65536 MiB (64 GiB).\n"
+        },
+        "architecture": {
+          "type": "string",
+          "enum": [
+            "x86_64",
+            "arm64"
+          ],
+          "default": "x86_64",
+          "description": "Requested CPU architecture. If omitted, x86_64 is used. The\nselected IDC must support the value.\n"
+        }
+      }
+    },
+    "ImageSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "image"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "image"
+          ]
+        },
+        "image": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Debian or Ubuntu container image reference. The server validates\nthe image against the IDC-supported base OS policy.\n"
+        }
+      }
+    },
+    "PresetResourceSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "product"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "preset"
+          ]
+        },
+        "product": {
+          "type": "string",
+          "description": "Sandbox product specification id (catalog SKU, for example\n`gmi.sandbox.x-large`).\n"
+        }
+      }
+    },
+    "ResourceSelection": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/PresetResourceSelection"
+        },
+        {
+          "$ref": "#/$defs/CustomResourceSelection"
+        }
+      ],
+      "description": "Resource values may be selected by catalog product SKU or supplied as a\ncustom configuration. Active presets use operator-managed IDC product\nvalues without custom-resource limit validation. Only custom values\nmust pass the 16 vCPU / 64 GiB memory / 64 GiB boot disk limits and the\nselected IDC's representability checks.\n"
+    },
+    "TemplateSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "template_id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "template"
+          ]
+        },
+        "template_id": {
+          "type": "string",
+          "description": "Parent GMI Template identifier in the same IDC."
+        },
+        "build_id": {
+          "type": "string",
+          "description": "Optional parent Build identifier. When omitted, the parent's\ncurrent successful Build is used.\n"
+        }
+      }
+    }
+  }
+}

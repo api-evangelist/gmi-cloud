@@ -1,0 +1,29 @@
+generated: '2026-10-13'
+method: derived
+source: openapi/gmi-cloud-cluster-engine-openapi.yml, openapi/gmi-cloud-idc-service-openapi.yml,
+  openapi/gmi-cloud-sandbox-openapi.yml
+summary:
+  types:
+  - apiKey
+  - http
+  api_key_in:
+  - header
+schemes:
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  sources:
+  - openapi/gmi-cloud-cluster-engine-openapi.yml
+  - openapi/gmi-cloud-idc-service-openapi.yml
+  - openapi/gmi-cloud-sandbox-openapi.yml
+- name: sandboxAccessToken
+  type: apiKey
+  in: header
+  parameter: X-Access-Token
+  description: |-
+    Sandbox data-plane token — the `sandbox_access_token` returned by the create/connect endpoints. Used for `/files`, Sandbox-Exec, and other data-plane endpoints; the control plane (`/api/v2`) does not accept it, and conversely the control plane's `Authorization: Bearer` is invalid on the data plane.
+
+    The token is bound to its sandbox: using sandbox A's token against sandbox B's host fails. It stays
+  sources:
+  - openapi/gmi-cloud-sandbox-openapi.yml

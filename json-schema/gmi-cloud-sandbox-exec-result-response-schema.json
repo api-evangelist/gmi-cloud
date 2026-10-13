@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-sandbox-exec-result-response-schema.json",
+  "title": "SandboxExecResultResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-sandbox-openapi.yml#/components/schemas/SandboxExecResultResponse",
+  "type": "object",
+  "required": [
+    "execution_id",
+    "sandbox_id",
+    "status",
+    "exit_code",
+    "stdout",
+    "stderr",
+    "stdout_truncated",
+    "stderr_truncated",
+    "started_at",
+    "completed_at"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Echo of X-Request-ID when supplied."
+    },
+    "execution_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sandbox_id": {
+      "type": "string",
+      "description": "Echo of the data-plane addressing key (i.e. `sandbox_key`; the data plane identifies the instance by the key in the host)."
+    },
+    "status": {
+      "$ref": "#/$defs/SandboxExecStatus"
+    },
+    "exit_code": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32",
+      "description": "Process exit code; null while non-terminal or when canceled."
+    },
+    "stdout": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Captured standard output, or null while not yet available."
+    },
+    "stderr": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Captured standard error, or null while not yet available."
+    },
+    "stdout_truncated": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "stderr_truncated": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "started_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "SandboxExecStatus": {
+      "type": "string",
+      "description": "Public lifecycle status of a sandbox execution.",
+      "enum": [
+        "pending",
+        "running",
+        "canceling",
+        "succeeded",
+        "failed",
+        "canceled"
+      ]
+    }
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-firewall-resp-schema.json",
+  "title": "FirewallResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-cluster-engine-openapi.yml#/components/schemas/FirewallResp",
+  "allOf": [
+    {
+      "$ref": "#/$defs/FirewallCreateReq"
+    },
+    {
+      "properties": {
+        "assoInstances": {
+          "$ref": "#/$defs/UuidList"
+        },
+        "assoContainers": {
+          "$ref": "#/$defs/UuidList",
+          "description": "Associated container instance IDs"
+        },
+        "id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "isPreset": {
+          "description": "Whether this is a preset firewall (cannot be deleted or have rules modified)",
+          "type": "boolean"
+        },
+        "orgId": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "building",
+            "error"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  ],
+  "$defs": {
+    "FirewallCreateReq": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/FirewallUpdateReq"
+        },
+        {
+          "properties": {
+            "idc": {
+              "$ref": "#/$defs/idcName"
+            }
+          },
+          "required": [
+            "idc"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "FirewallRuleWithPortRange": {
+      "properties": {
+        "description": {
+          "maxLength": 255,
+          "type": "string"
+        },
+        "portRange": {
+          "$ref": "#/$defs/portRange"
+        },
+        "protocol": {
+          "enum": [
+            "tcp",
+            "udp"
+          ],
+          "type": "string"
+        },
+        "remoteIpPrefix": {
+          "$ref": "#/$defs/remoteIpPrefix"
+        }
+      },
+      "required": [
+        "protocol",
+        "portRange",
+        "remoteIpPrefix"
+      ],
+      "type": "object"
+    },
+    "FirewallRuleWithoutPortRange": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "maxLength": 255,
+          "type": "string"
+        },
+        "protocol": {
+          "enum": [
+            "icmp",
+            "any"
+          ],
+          "type": "string"
+        },
+        "remoteIpPrefix": {
+          "$ref": "#/$defs/remoteIpPrefix"
+        }
+      },
+      "required": [
+        "protocol",
+        "remoteIpPrefix"
+      ],
+      "type": "object"
+    },
+    "FirewallRules": {
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/FirewallRuleWithPortRange"
+          },
+          {
+            "$ref": "#/$defs/FirewallRuleWithoutPortRange"
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "FirewallUpdateReq": {
+      "properties": {
+        "description": {
+          "maxLength": 255,
+          "type": "string"
+        },
+        "inboundRules": {
+          "$ref": "#/$defs/FirewallRules"
+        },
+        "name": {
+          "maxLength": 255,
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "inboundRules"
+      ],
+      "type": "object"
+    },
+    "UuidList": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "idcName": {
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    },
+    "portRange": {
+      "properties": {
+        "max": {
+          "maximum": 65535,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "min": {
+          "maximum": 65535,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "type": "object"
+    },
+    "remoteIpPrefix": {
+      "description": "CIDR notation",
+      "pattern": "^[0-9]{1,3}(\\.[0-9]{1,3}){3}\\/[0-9]{1,2}$",
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-elastic-ipresp-schema.json",
+  "title": "elasticIPResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-cluster-engine-openapi.yml#/components/schemas/elasticIPResp",
+  "allOf": [
+    {
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "orgId": {
+          "description": "if nil, it means the elastic IP is not associated with any instance",
+          "format": "uuid",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "released",
+            "associated",
+            "disassociated"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "orgId",
+        "id",
+        "status"
+      ],
+      "type": "object"
+    },
+    {
+      "$ref": "#/$defs/elasticIP"
+    },
+    {
+      "$ref": "#/$defs/elasticIPAssociateConfig"
+    }
+  ],
+  "type": "object",
+  "$defs": {
+    "elasticIP": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/elasticIPConfig"
+        },
+        {
+          "properties": {
+            "idc": {
+              "$ref": "#/$defs/idcName"
+            },
+            "ipAddress": {
+              "description": "IP address of the elastic IP. The longest possible IPv6 address is 39 characters",
+              "maxLength": 39,
+              "minLength": 7,
+              "type": "string"
+            },
+            "product": {
+              "$ref": "#/$defs/productName"
+            }
+          },
+          "required": [
+            "idc",
+            "ipAddress",
+            "product"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "elasticIPAssociateConfig": {
+      "properties": {
+        "instanceID": {
+          "description": "set instanceID and instanceType to associate the elastic IP to the instance, set to null to disassociate the elastic IP from the instance",
+          "format": "uuid",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "instanceType": {
+          "$ref": "#/$defs/instanceType"
+        }
+      },
+      "type": "object"
+    },
+    "elasticIPConfig": {
+      "properties": {
+        "internetConnectionType": {
+          "default": "Dual-Homed",
+          "enum": [
+            "BGP",
+            "Dual-Homed"
+          ],
+          "type": "string"
+        },
+        "maxBandwidth": {
+          "default": "100 Gbps",
+          "maxLength": 1048576,
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/name",
+          "description": "Name of the elastic IP"
+        }
+      },
+      "required": [
+        "name",
+        "internetConnectionType",
+        "maxBandwidth"
+      ],
+      "type": "object"
+    },
+    "idcName": {
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    },
+    "instanceType": {
+      "enum": [
+        "baremetal",
+        "container"
+      ],
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "name": {
+      "maxLength": 255,
+      "pattern": "^([A-Za-z0-9][A-Za-z0-9_\\-. ]*)?[A-Za-z0-9]$",
+      "type": "string"
+    },
+    "productName": {
+      "maxLength": 256,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    }
+  }
+}

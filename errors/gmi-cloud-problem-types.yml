@@ -1,0 +1,121 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/gmi-cloud-cluster-engine-openapi.yml
+- openapi/gmi-cloud-idc-service-openapi.yml
+- openapi/gmi-cloud-sandbox-openapi.yml
+format: custom
+envelope:
+  media_type: application/json
+  schema: error
+coverage:
+  operations: 95
+  statuses_declared: 15
+problems:
+- status: 400
+  title: Bad Request
+  description: Invalid request parameters
+  operations: 60
+  media_types:
+  - application/json
+  schema: ErrStatusMsg
+- status: 401
+  title: Unauthorized
+  description: Authentication information is missing or invalid
+  operations: 67
+  media_types:
+  - application/json
+  schema: errorStatusMessage
+- status: 403
+  title: Forbidden
+  description: The caller cannot access the organization-scoped resource.
+  operations: 28
+  media_types:
+  - application/json
+  schema: ErrorResponse
+- status: 404
+  title: Not Found
+  description: The specified resource was not found
+  operations: 58
+  media_types:
+  - application/json
+  schema: error
+- status: 409
+  title: Conflict
+  description: State conflict
+  operations: 19
+  media_types:
+  - application/json
+  schema: ErrorResponse
+- status: 410
+  title: Gone
+  description: The provider artifact and its live logs are no longer available.
+  operations: 1
+  media_types:
+  - application/json
+  schema: ErrorResponse
+- status: 413
+  title: Content Too Large
+  description: The file exceeds the data center's per-file size limit.
+  operations: 1
+  media_types:
+  - application/json
+  schema: SandboxFileError
+- status: 415
+  title: Unsupported Media Type
+  description: The request body is not `multipart/form-data`.
+  operations: 1
+  media_types:
+  - application/json
+  schema: SandboxFileError
+- status: 416
+  title: Range Not Satisfiable
+  description: '**Optional capability**, returned only by data centers that support resuming: the `Range` start
+    is beyond the file length.'
+  operations: 1
+  media_types:
+  - application/json
+  schema: SandboxFileError
+- status: 422
+  title: Unprocessable Content
+  description: The request is valid but the selected IDC or provider does not support
+  operations: 4
+  media_types:
+  - application/json
+  schema: ErrorResponse
+- status: 429
+  title: Too Many Requests
+  description: The execution provider rate-limited the request.
+  operations: 11
+  media_types:
+  - application/json
+  schema: ErrStatusMsg
+- status: 500
+  title: Internal Server Error
+  description: Internal Server Error
+  operations: 94
+  media_types:
+  - application/json
+  schema: error
+- status: 502
+  title: Bad Gateway
+  description: The selected Sandbox provider is unavailable or returned an error.
+  operations: 5
+  media_types:
+  - application/json
+  schema: ErrorResponse
+- status: 503
+  title: Service Unavailable
+  description: a dependent service is unavailable
+  operations: 40
+  media_types:
+  - application/json
+  schema: error
+- status: 507
+  title: Insufficient Storage
+  description: The sandbox is out of disk space.
+  operations: 1
+  media_types:
+  - application/json
+  schema: SandboxFileError

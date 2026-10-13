@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-containers-resp-schema.json",
+  "title": "containersResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-cluster-engine-openapi.yml#/components/schemas/containersResp",
+  "allOf": [
+    {
+      "properties": {
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "eipAddress": {
+          "type": "string"
+        },
+        "eipId": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "firewalls": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "inboundIP": {
+          "$ref": "#/$defs/externalIP"
+        },
+        "modifiedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "orgId": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "outboundIP": {
+          "$ref": "#/$defs/externalIP"
+        },
+        "publicIP": {
+          "$ref": "#/$defs/externalIP"
+        },
+        "reason": {
+          "description": "reason of container status",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/containerStatus"
+        },
+        "storages": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Storage"
+          },
+          "minLength": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "reason",
+        "storages"
+      ],
+      "type": "object"
+    },
+    {
+      "$ref": "#/$defs/container"
+    }
+  ],
+  "$defs": {
+    "Env": {
+      "properties": {
+        "name": {
+          "maxLength": 4096,
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "type": "string"
+        },
+        "value": {
+          "default": "",
+          "maxLength": 1048576,
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "Storage": {
+      "description": "mount persistent file systems in the container pod",
+      "properties": {
+        "containerPath": {
+          "description": "Mounting root directory \"/\" is not allowed",
+          "maxLength": 4096,
+          "pattern": "^\\/.+$",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "containerPath"
+      ]
+    },
+    "UuidList": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "container": {
+      "allOf": [
+        {
+          "properties": {
+            "idc": {
+              "$ref": "#/$defs/idcName"
+            },
+            "product": {
+              "$ref": "#/$defs/productName"
+            }
+          },
+          "required": [
+            "product",
+            "idc"
+          ],
+          "type": "object"
+        },
+        {
+          "$ref": "#/$defs/containerConfig"
+        }
+      ]
+    },
+    "containerConfig": {
+      "properties": {
+        "args": {
+          "default": [],
+          "description": "Optional container command arguments",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "command": {
+          "default": "",
+          "description": "Optional container start command",
+          "type": "string",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "envs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Env"
+          },
+          "minLength": 0,
+          "type": "array"
+        },
+        "name": {
+          "$ref": "#/$defs/name"
+        },
+        "ports": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/exposedPort"
+          },
+          "maxLength": 5,
+          "minLength": 0,
+          "type": "array",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "sshKeyIdList": {
+          "$ref": "#/$defs/UuidList",
+          "description": "The list of SSH key IDs to use in the container"
+        },
+        "templateId": {
+          "description": "template id",
+          "format": "uuid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "templateId"
+      ],
+      "type": "object"
+    },
+    "containerStatus": {
+      "enum": [
+        "unknown",
+        "creating",
+        "running",
+        "terminating",
+        "stopped",
+        "error",
+        "zombie"
+      ],
+      "type": "string"
+    },
+    "exposedPort": {
+      "properties": {
+        "containerPort": {
+          "maximum": 65534,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "port": {
+          "maximum": 65534,
+          "minimum": 0,
+          "type": "integer",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "protocol": {
+          "enum": [
+            "TCP",
+            "UDP"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "containerPort",
+        "protocol"
+      ]
+    },
+    "externalIP": {
+      "properties": {
+        "ipAddress": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "pending",
+            "error",
+            "not_applicable"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "ipAddress",
+        "status"
+      ],
+      "x-go-type-skip-optional-pointer": true
+    },
+    "idcName": {
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 255,
+      "pattern": "^([A-Za-z0-9][A-Za-z0-9_\\-. ]*)?[A-Za-z0-9]$",
+      "type": "string"
+    },
+    "productName": {
+      "maxLength": 256,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    }
+  }
+}

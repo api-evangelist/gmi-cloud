@@ -1,0 +1,15 @@
+generated: '2026-10-13'
+method: probed
+generator: harvest-packages.py
+source: registry metadata endpoints (registry.npmjs.org, pypi.org, rubygems.org, api.nuget.org, packagist.org, crates.io) ; github.com/gmicloud
+ownership_rule: 'official: true only when the registry metadata (homepage, repository, author, URLs) names the provider''s domain (authentication/gmi-cloud-authentication.yml,
+  gmicloud.ai, security/gmi-cloud-domain-security.yml) or its accepted GitHub org (gmicloud).'
+packages:
+- name: gmicloud
+  registry: pypi
+  url: https://pypi.org/project/gmicloud/
+  language: Python
+  official: true
+  version: 0.1.10
+  published: '2025-07-15'
+  evidence: metadata names gmicloud.ai

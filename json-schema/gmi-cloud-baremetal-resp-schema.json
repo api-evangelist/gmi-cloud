@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/gmi-cloud/main/json-schema/gmi-cloud-baremetal-resp-schema.json",
+  "title": "BaremetalResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/gmi-cloud-cluster-engine-openapi.yml#/components/schemas/BaremetalResp",
+  "properties": {
+    "associatedFirewalls": {
+      "$ref": "#/$defs/UuidList"
+    },
+    "consoleReady": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "idc": {
+      "$ref": "#/$defs/idcName"
+    },
+    "image": {
+      "type": "string"
+    },
+    "imageId": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "networks": {
+      "items": {
+        "$ref": "#/$defs/BaremetalNetworkAddr"
+      },
+      "type": "array"
+    },
+    "orgId": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "product": {
+      "$ref": "#/$defs/productName"
+    },
+    "reason": {
+      "description": "The reason for the validation error.",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "creating",
+        "deleted",
+        "deleting",
+        "error",
+        "powercycling",
+        "rebooting",
+        "rebuilding",
+        "running",
+        "starting",
+        "stopped",
+        "stopping",
+        "unknown"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "orgId",
+    "idc",
+    "id",
+    "name",
+    "status",
+    "networks",
+    "image",
+    "imageId",
+    "product",
+    "associatedFirewalls",
+    "createdAt",
+    "consoleReady"
+  ],
+  "type": "object",
+  "$defs": {
+    "BaremetalNetworkAddr": {
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "internal",
+            "external"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "UuidList": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "idcName": {
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    },
+    "productName": {
+      "maxLength": 256,
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "type": "string"
+    }
+  }
+}
