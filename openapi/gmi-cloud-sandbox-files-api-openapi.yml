@@ -1,0 +1,384 @@
+openapi: 3.2.0
+info:
+  title: GMI Sandbox Sandbox Files API
+  description: 'REST API for GMI Sandbox: create isolated execution environments from templates, manage their lifecycle on the control plane, and run commands or transfer files through each sandbox''s own data plane.'
+  contact:
+    name: GMI Cloud Support
+    email: support@gmicloud.ai
+  version: '2.0'
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v2
+  description: Control plane
+security:
+- bearerAuth: []
+tags:
+- name: Sandbox-Files
+  description: Sandbox file data plane (`/files`).
+paths:
+  /files:
+    servers:
+    - url: https://{sandbox_key}.{domain}
+      description: 'Sandbox data-plane entry point. Both variables come from the create/connect response: `sandbox_key` is `data.sandbox_key`, `domain` is `data.domain`.
+
+        '
+      variables:
+        sandbox_key:
+          default: sandbox-key
+          description: Sandbox key (the `sandbox_key` returned by the create/connect endpoints)
+        domain:
+          default: sandbox.example.com
+          description: 'The `domain` returned verbatim by the create/connect endpoints. Its default naming shape is `{idc-name}.{root-hostname}`, but clients must not assemble or derive it themselves.
+
+            '
+    get:
+      tags:
+      - Sandbox-Files
+      summary: Download a sandbox file
+      description: 'Reads a single file inside the sandbox by absolute path; the response body is the raw byte stream.
+
+
+        ## Three ways this differs from the rest of the platform
+
+
+        1. **Not served under `/api/v2`** — see this operation''s `servers`.
+
+        2. **The auth header is `X-Access-Token`** (the `sandbox_access_token` value), not `Authorization: Bearer`. Control-plane tokens are invalid here, and vice versa.
+
+        3. **Successful responses are not wrapped in the `{request_id, data}` envelope** (the body is a byte stream), and neither are errors — see the error notes below.
+
+
+        ## Optional capabilities: `Content-Length` and resumable downloads
+
+
+        Both **vary by data center; clients must not assume they exist**:
+
+
+        | Capability | When supported | When not supported |
+
+        | --- | --- | --- |
+
+        | `Accept-Ranges` | `bytes` | `none` |
+
+        | `Content-Length` | Declares the byte count; enables progress display | Absent; `Transfer-Encoding: chunked` |
+
+        | `Range` requests | Returns `206` + `Content-Range` per RFC 7233 | **Returns `200` with the full file** |
+
+
+        **`Accept-Ranges` is the only runtime capability probe**: issue one request without `Range`, or read the header on the first response, before deciding whether to resume.
+
+
+        Data centers without resume support **never fake a `206`**: a request with `Range` gets `200` and the entire file. This is deliberate — a client that mistakes the response for a range would write bytes at the wrong offset and produce a silently corrupted file, which is far worse than an ignored `Range`. The correct resumable-download logic is therefore "resume only when `Accept-Ranges: bytes`, otherwise re-download the whole file" — **never** key off any signal other than `206`.
+
+
+        The server returns no checksum headers (neither backend provides them); clients that need integrity verification should compute and compare checksums themselves.'
+      operationId: downloadSandboxFile
+      parameters:
+      - $ref: '#/components/parameters/SandboxFilePathQueryParam'
+      - $ref: '#/components/parameters/SandboxFileUsernameQueryParam'
+      - name: Range
+        in: header
+        required: false
+        description: 'Only honored in data centers with `Accept-Ranges: bytes`; format `bytes=<start>-<end>`. Other data centers ignore the header and return `200` + the full file (not `206`).
+
+          '
+        schema:
+          type: string
+        example: bytes=1048576-
+      responses:
+        '200':
+          description: 'The full file. Requests with `Range` also take this branch when the data center does not support resuming.
+
+            '
+          headers:
+            Content-Disposition:
+              description: '`attachment; filename="<basename>"`'
+              schema:
+                type: string
+            Accept-Ranges:
+              description: '`bytes` (resume supported) or `none` (not supported).'
+              schema:
+                type: string
+                enum:
+                - bytes
+                - none
+            Content-Length:
+              description: '**Optional.** Present only in data centers that know the file size up front; when absent the response is chunked.
+
+                '
+              schema:
+                type: integer
+                format: int64
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '206':
+          description: '**Optional capability.** Returned only by data centers with `Accept-Ranges: bytes`; a request with `Range` may still get `200`, and clients must handle whichever status code actually arrives.
+
+            '
+          headers:
+            Content-Range:
+              description: '`bytes <start>-<end>/<total>`'
+              schema:
+                type: string
+            Content-Length:
+              description: Byte count of this range
+              schema:
+                type: integer
+                format: int64
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/SandboxFileBadRequest'
+        '401':
+          $ref: '#/components/responses/SandboxFileUnauthorized'
+        '403':
+          $ref: '#/components/responses/SandboxFileForbidden'
+        '404':
+          $ref: '#/components/responses/SandboxFileNotFound'
+        '416':
+          description: '**Optional capability**, returned only by data centers that support resuming: the `Range` start is beyond the file length.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxFileError'
+        '429':
+          $ref: '#/components/responses/SandboxFileRateLimited'
+        '500':
+          $ref: '#/components/responses/SandboxFileInternalError'
+        '502':
+          $ref: '#/components/responses/SandboxFileUpstreamError'
+      security:
+      - sandboxAccessToken: []
+      x-source: https://docs.gmicloud.ai/api-reference/sandbox-files/download-a-sandbox-file.md
+    post:
+      tags:
+      - Sandbox-Files
+      summary: Upload a sandbox file
+      description: 'Writes one file to the given absolute path inside the sandbox via `multipart/form-data`, overwriting any existing file.
+
+
+        Authentication, host, and the error envelope are identical to the download endpoint (see `GET /files`).
+
+
+        ## Request constraints
+
+
+        - **The target path is given only in the `path` query parameter.** Including an additional `path` form field in the body is rejected (`400`): when the two sources disagree there is no way to know which to trust, and failing is better than guessing.
+
+        - The request body must be `multipart/form-data`; any other `Content-Type` returns `415`.
+
+        - One file per request.
+
+        - **No chunked/resumable upload.** There is no `Range` semantics for uploads; an interrupted upload must be resent in full. A data center may enforce a per-file size limit and return `413` when exceeded; the limit is not exposed through the API.'
+      operationId: uploadSandboxFile
+      parameters:
+      - $ref: '#/components/parameters/SandboxFilePathQueryParam'
+      - $ref: '#/components/parameters/SandboxFileUsernameQueryParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file content.
+            encoding:
+              file:
+                contentType: application/octet-stream
+      responses:
+        '200':
+          description: 'Write complete. The array shape exists for compatibility with existing SDKs; it currently always holds a single element.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SandboxFileEntry'
+              example:
+              - path: /home/user/data.bin
+                name: data.bin
+                type: file
+        '400':
+          $ref: '#/components/responses/SandboxFileBadRequest'
+        '401':
+          $ref: '#/components/responses/SandboxFileUnauthorized'
+        '403':
+          $ref: '#/components/responses/SandboxFileForbidden'
+        '404':
+          $ref: '#/components/responses/SandboxFileNotFound'
+        '413':
+          description: The file exceeds the data center's per-file size limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxFileError'
+        '415':
+          description: The request body is not `multipart/form-data`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxFileError'
+        '429':
+          $ref: '#/components/responses/SandboxFileRateLimited'
+        '500':
+          $ref: '#/components/responses/SandboxFileInternalError'
+        '502':
+          $ref: '#/components/responses/SandboxFileUpstreamError'
+        '507':
+          description: The sandbox is out of disk space.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxFileError'
+      security:
+      - sandboxAccessToken: []
+      x-source: https://docs.gmicloud.ai/api-reference/sandbox-files/upload-a-sandbox-file.md
+components:
+  responses:
+    SandboxFileNotFound:
+      description: 'The target file or its parent directory does not exist, or the sandbox is no longer available (deleted/stopped). These cases are likewise not distinguished.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxFileError'
+    SandboxFileUnauthorized:
+      description: '`X-Access-Token` is missing, malformed, expired, or does not belong to this sandbox.
+
+
+        **All of these cases return exactly the same status code and message**, so they cannot be told apart. This is deliberate: distinguishable errors would let callers use this endpoint as a sandbox-existence probe.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxFileError'
+    SandboxFileUpstreamError:
+      description: 'The data plane''s own backend call failed. **This is a server-side problem, not a caller credential problem** — re-fetching the token will not help; back off and retry, or report it.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxFileError'
+    SandboxFileBadRequest:
+      description: 'Invalid request: `path` is missing, is not an absolute path, or the upload body carries a duplicate `path` field.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxFileError'
+    SandboxFileInternalError:
+      description: Data-plane internal error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxFileError'
+    SandboxFileForbidden:
+      description: The token is valid, but file permissions inside the sandbox do not allow the operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxFileError'
+    SandboxFileRateLimited:
+      description: Data-plane rate limit hit; back off and retry.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxFileError'
+  schemas:
+    SandboxFileEntry:
+      type: object
+      description: Result entry for a single write.
+      required:
+      - path
+      - name
+      - type
+      properties:
+        path:
+          type: string
+          description: Absolute path of the file inside the sandbox
+          example: /home/user/data.bin
+        name:
+          type: string
+          description: File name (the last segment of `path`)
+          example: data.bin
+        type:
+          type: string
+          enum:
+          - file
+          description: Entry type. Only files are written today, so this is always `file`.
+    SandboxFileError:
+      type: object
+      description: 'Data-plane error body. **It has only `message`** — no `code`, and no platform `{request_id, data}` envelope. This differs from every endpoint under `/api/v2`.
+
+
+        The reason is that the data plane and the control plane are separate entry points: requests do not pass through the platform gateway, so there is no platform `request_id` and no context for producing platform business error codes. Branch on the HTTP status code; `message` is for humans only — its wording is not a contract and must not be used in program logic.
+
+
+        `message` is always the server''s own wording: raw backend error text may contain internal details such as absolute paths inside the sandbox, so it is logged only and never returned.
+
+        '
+      required:
+      - message
+      properties:
+        message:
+          type: string
+          description: Human-readable error text. Not stable; do not parse.
+          example: unauthorized
+  parameters:
+    SandboxFileUsernameQueryParam:
+      name: username
+      in: query
+      required: false
+      description: 'Perform the file operation as this user; defaults to the sandbox''s default user. **Optional capability**: some data centers ignore this parameter and always act as the default user, so do not rely on it for permission isolation.
+
+        '
+      schema:
+        type: string
+      example: user
+    SandboxFilePathQueryParam:
+      name: path
+      in: query
+      required: true
+      description: '**Absolute path** inside the sandbox. Must start with `/`; relative segments such as `.` / `..` are rejected. No semantic interpretation is applied beyond existence checks; for writes, the parent directory must already exist.
+
+        '
+      schema:
+        type: string
+        minLength: 1
+      example: /home/user/data.bin
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API Key or Access Token, always sent as `Authorization: Bearer <token>`. The gateway recognizes the token type automatically.
+
+        '
+    sandboxAccessToken:
+      type: apiKey
+      in: header
+      name: X-Access-Token
+      description: 'Sandbox data-plane token — the `sandbox_access_token` returned by the create/connect endpoints. Used for `/files`, Sandbox-Exec, and other data-plane endpoints; the control plane (`/api/v2`) does not accept it, and conversely the control plane''s `Authorization: Bearer` is invalid on the data plane.
+
+
+        The token is bound to its sandbox: using sandbox A''s token against sandbox B''s host fails. It stays valid until the sandbox''s lifetime ends; there is no separate rotation endpoint (`rotate_traffic_token` rotates the port traffic token `traffic_access_token` and does not affect this one).
+
+        '

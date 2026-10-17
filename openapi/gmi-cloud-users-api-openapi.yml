@@ -1,0 +1,550 @@
+openapi: 3.2.0
+info:
+  title: IDC Service Users API
+  description: APIs for IDC Service.
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v1
+  description: IDC Service API
+security: []
+tags:
+- name: Users
+paths:
+  /users/{userId}:
+    delete:
+      tags:
+      - Users
+      summary: Delete a user account
+      description: 'Delete a user account.
+
+        - A user can delete their own account.
+
+        - An organization owner cannot be deleted.
+
+        - An organization owner can delete any user within the same organization.'
+      parameters:
+      - $ref: '#/components/parameters/userIdParam'
+      responses:
+        '200':
+          description: Successfully deleted the user.
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: userId
+                      expression: uuid
+                      originalValue: userId
+                      reason: Should be a valid UUID.
+        '403':
+          description: '- [group:**organization**, code:**6**]: Organization owner cannot be deleted.
+
+            - [group:**user**, code:**4**]: The user has no permission to access the resources.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization owner cannot be deleted:
+                  summary: Organization owner cannot be deleted.
+                  value:
+                    group: organization
+                    code: 6
+                    message: Organization owner cannot be deleted.
+        '500':
+          description: '- [group:**organization**, code:**1200**]: Get organization grouping policy encountered error.
+
+            - [group:**session**, code:**5**]: Failed to delete session.
+
+            - [group:**user**, code:**1600**]: Delete user data encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization grouping policy encountered error:
+                  summary: Get organization grouping policy encountered error.
+                  value:
+                    group: organization
+                    code: 1200
+                    message: Get organization grouping policy encountered error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/users/delete-a-user-account.md
+      operationId: deleteUsersByUserId
+      x-operation-id-source: derived
+  /users/password-reset:
+    post:
+      tags:
+      - Users
+      summary: Request password reset
+      description: Sends a password reset email to the user.
+      operationId: requestPasswordReset
+      requestBody:
+        description: The request body for requesting a password reset.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/passwordResetRequest'
+      responses:
+        '200':
+          description: Successfully sent password reset email.
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            - [group:**request**, code:**1**]: The request body is required.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: email
+                      expression: required
+                      originalValue: ''
+                      reason: This field is required.
+        '429':
+          description: '- [group:**user**, code:**200**]: Too many password reset requests.
+
+            '
+          headers:
+            Retry-After:
+              description: The number of seconds the user should wait before retrying.
+              schema:
+                type: integer
+                example: 300
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Too many password reset requests:
+                  summary: Too many password reset requests.
+                  value:
+                    group: user
+                    code: 200
+                    message: Too many password reset requests.
+        '500':
+          description: '- [group:**user**, code:**201**]: Get user password reset data encountered error.
+
+            - [group:**user**, code:**202**]: Get user password reset data TTL encountered error.
+
+            - [group:**user**, code:**203**]: Save user password reset data encountered error.
+
+            - [group:**user**, code:**204**]: Create OTP code encountered error.
+
+            - [group:**user**, code:**205**]: Create password reset token encountered error.
+
+            - [group:**user**, code:**1200**]: Get user encountered DB error.
+
+            - [group:**email**, code:**0**]: Failed to send email.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get user password reset data encountered error:
+                  summary: Get user password reset data encountered error.
+                  value:
+                    group: user
+                    code: 201
+                    message: Get user password reset data encountered error.
+                    traces:
+                    - error occurred.
+      x-source: https://docs.gmicloud.ai/api-reference/users/request-password-reset.md
+  /users/email-verification-code:
+    post:
+      tags:
+      - Users
+      summary: Resend email verification code
+      description: Resend email verificaion code.
+      operationId: resendEmailCodeRequest
+      responses:
+        '201':
+          description: Successfully resent email verfication code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resendEmailVerificationCodeResponse'
+        '401':
+          description: '- [group:**user**, code:**406**]: Invalid email verification token.
+
+            - [group:**user**, code:**407**]: Expired email verification token.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid email verification token:
+                  summary: Invalid email verification token.
+                  value:
+                    group: user
+                    code: 406
+                    message: Invalid email verification token.
+        '429':
+          description: '- [group:**user**, code:**400**]: Too many email verification code resend requests.
+
+            '
+          headers:
+            Retry-After:
+              description: The number of seconds the user should wait before retrying.
+              schema:
+                type: integer
+                example: 300
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Too many email verification code resend attempts:
+                  summary: Too many email verification code resend attempts.
+                  value:
+                    group: user
+                    code: 400
+                    message: Too many email verification code resend attempts.
+        '500':
+          description: '- [group:**user**, code:**401**]: Get user email verification data encountered error.
+
+            - [group:**user**, code:**402**]: Get user email verification data TTL encountered error.
+
+            - [group:**user**, code:**403**]: Save user email verification data encountered error.
+
+            - [group:**user**, code:**404**]: Create OTP code encountered error.
+
+            - [group:**user**, code:**405**]: Create email verification token encountered error.
+
+            - [group:**email**, code:**0**]: Failed to send email.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get user email verification data encountered error:
+                  summary: Get user email verification data encountered error.
+                  value:
+                    group: user
+                    code: 401
+                    message: Get user email verification data encountered error.
+                    traces:
+                    - error occurred.
+      security:
+      - bearerEmailVerificationToken: []
+      x-source: https://docs.gmicloud.ai/api-reference/users/resend-email-verification-code.md
+  /users/email-verification:
+    post:
+      tags:
+      - Users
+      summary: Verify user's email and complete user registration
+      description: 'Confirms the user''s email address and finalizes the the account creation process.
+
+
+        Upon successful verification:
+
+        - If `organization` was provided during signup, the new organization will be created and the user will become its owner.
+
+        - If `invitationKey` was provided during signup, the user joins the invited organization.'
+      operationId: emailVerification
+      requestBody:
+        description: The request body for email verification
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/emailVerificationRequest'
+      responses:
+        '201':
+          description: User email successfully verified and user account is created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/emailVerificationResponse'
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request body.
+
+            - [group:**request**, code:**1**]: The request body is required.
+
+            - [group:**user**, code:**408**]: Invalid otpCode.
+
+            - [group:**user**, code:**409**]: Expired otpCode.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request body:
+                  summary: Invalid field in the request body.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: email
+                      expression: required
+                      originalValue: ''
+                      reason: This field is required.
+        '401':
+          description: '- [group:**user**, code:**406**]: Invalid email verification token.
+
+            - [group:**user**, code:**407**]: Expired email verification token.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid email verification token:
+                  summary: Invalid email verification token.
+                  value:
+                    group: user
+                    code: 406
+                    message: Invalid email verification token.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**invitation**, code:**201**]: Get invitation encountered error.
+
+            - [group:**organization**, code:**1000**]: Create organization encountered DB error.
+
+            - [group:**organization**, code:**1001**]: Create organization grouping policy encountered error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:**session**, code:**200**]: Failed to create auth token.
+
+            - [group:**session**, code:**201**]: Failed to save auth token data.
+
+            - [group:**user**, code:**401**]: Get user email verification data encountered error.
+
+            - [group:**user**, code:**403**]: Save user email verification data encountered error.
+
+            - [group:**user**, code:**1000**]: Create user encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get user email verification data encountered error:
+                  summary: Get user email verification data encountered error.
+                  value:
+                    group: user
+                    code: 401
+                    message: Get user email verification data encountered error.
+                    traces:
+                    - error occurred.
+      security:
+      - bearerEmailVerificationToken: []
+      x-source: https://docs.gmicloud.ai/api-reference/users/verify-users-email-and-complete-user-registration.md
+components:
+  schemas:
+    ValidationDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the request data.
+          x-go-type-skip-optional-pointer: true
+        expression:
+          type: string
+          description: The form of violation.
+          x-go-type-skip-optional-pointer: true
+        argument:
+          type: string
+          description: The number or data to support the expression.
+          x-go-type-skip-optional-pointer: true
+        originalValue:
+          description: The original value from the request.
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          description: The reason for the validation error.
+          x-go-type-skip-optional-pointer: true
+      example:
+      - field: fieldXXX
+        expression: required
+        originalValue: ''
+        reason: This field is required.
+    emailVerificationResponse:
+      type: object
+      x-go-name: emailVerificationResponse
+      properties:
+        id:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          description: The user's ID.
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+        authToken:
+          type: string
+          description: A temporary token issued after the signup step. This token is used in the create session API to exchange for access and refresh tokens.
+          example: eyJhbGciOiJIUzI1NiIsInR...
+      required:
+      - id
+      - authToken
+    ErrStatusMsg:
+      type: object
+      properties:
+        group:
+          type: string
+          description: API function group\n -Will be "request" if there are invalid request parameters.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        code:
+          type: integer
+          description: The substatus error code for the API response.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        message:
+          type: string
+          description: The substatus error Message for API response.
+          x-go-type-skip-optional-pointer: true
+        traces:
+          type: array
+          items:
+            type: string
+          description: The original error messages.
+          x-go-type-skip-optional-pointer: true
+        validationDetail:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationDetail'
+          description: Returned when there are invalid request paremeters(group="request")\n List of invalid fields and the reason of error.
+          x-go-type-skip-optional-pointer: true
+      example:
+        group: request
+        code: 0
+        validationDetail:
+        - field: email
+          expression: required
+          originalValue: ''
+          reason: This field is required.
+      required:
+      - group
+      - code
+    passwordResetRequest:
+      type: object
+      x-go-name: passwordResetRequest
+      properties:
+        email:
+          type: string
+          description: 'User''s email address for requesting a password reset.
+
+            - Must be a valid email format.
+
+            '
+          example: john_doe@example.com
+          x-oapi-codegen-extra-tags:
+            binding: required,email
+      required:
+      - email
+    resendEmailVerificationCodeResponse:
+      type: object
+      x-go-name: resendEmailVerificationCodeResponse
+      properties:
+        emailVerificationToken:
+          type: string
+          description: A token used to verify the validity of an email address.
+          example: eyJhbGciOiJIUzI1NiIsInR...
+      required:
+      - emailVerificationToken
+    emailVerificationRequest:
+      type: object
+      x-go-name: emailVerificationRequest
+      properties:
+        otpCode:
+          type: string
+          description: 'A one-time passcode (OTP) provided by the user for email verification.
+
+            - Must be a numeric code.
+
+            '
+          example: 321673
+          x-oapi-codegen-extra-tags:
+            binding: required,numeric
+          x-go-type-skip-optional-pointer: true
+      required:
+      - otpCode
+  parameters:
+    userIdParam:
+      name: userId
+      in: path
+      schema:
+        type: string
+        format: uuid
+        x-go-type: uuid.UUID
+        example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+      required: true
+      description: 'The user''s ID.
+
+        - Must be a valid UUID.
+
+        '
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "An access token used to authenticate a user and grant access to restricted APIs. It is issued by session APIs.\nFor status codes related to this header, refer to the \n[Common Headers Documentation](https://gmicloud.atlassian.net/wiki/spaces/CE/pages/47199534/Common+Headers#Authorization).\n"
+    bearerAPIKey:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'An API key used to authenticate a user and grant access to restricted models. It is issued by api-keys APIs.
+
+        '
+    bearerEmailVerificationToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'A token used to verify the validity of an email address.
+
+        It must be included in the Authorization header when verifying the email address.
+
+        '

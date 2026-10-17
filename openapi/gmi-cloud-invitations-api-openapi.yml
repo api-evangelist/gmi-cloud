@@ -1,0 +1,220 @@
+openapi: 3.2.0
+info:
+  title: IDC Service Invitations API
+  description: APIs for IDC Service.
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v1
+  description: IDC Service API
+security: []
+tags:
+- name: Invitations
+paths:
+  /invitations/{invitationKey}:
+    post:
+      tags:
+      - Invitations
+      summary: Accept invitation by key
+      description: Allows user to accept an invitation to join the organization using invitationKey. The user will automatically leave their current organization.
+      operationId: acceptInvitationByKey
+      parameters:
+      - name: invitationKey
+        in: path
+        schema:
+          type: string
+          example: CB8OZUZQUxddQG9DTAlGXg9Ea0IBV18EQ25FTFhAUVtcakdRU0JVRGUaDxodEwwdNhwLWRNVEToRAlVNSlQKbxFIVxcDTHIRA1oQSlsLPUoHB0FdRD5CUA
+        required: true
+        description: 'The invitation key for joining an existing organization.
+
+          '
+      responses:
+        '200':
+          description: Successfully accepted the invitation.
+        '400':
+          description: '- [group:**invitation**, code:**3**]: Invalid invitationKey.
+
+            - [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: invitationKey
+                      expression: required
+                      originalValue: ''
+                      reason: This field is required.
+        '403':
+          description: '- [group:**invitation**, code:**1**]: The user has no permission to access the invitation resources.
+
+            - [group:**invitation**, code:**2**]: The invitation has been revoked.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                The user does not have permission to access invitation resources:
+                  summary: The user has no permission to access the invitation resources.
+                  value:
+                    group: invitation
+                    code: 1
+                    message: The user has no permission to access invitation resources.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '409':
+          description: '- [group:**organization**, code:**0**]: User already owns an organization.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                User already owns an organization:
+                  summary: The user already owns an organization.
+                  value:
+                    group: organization
+                    code: 0
+                    message: User already owns an organization.
+        '500':
+          description: '- [group:**invitation**, code:**201**]: Get invitation encountered error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:**organization**, code:**1400**]: Update organization grouping policy encountered error.
+
+            - [group:**session**, code:**3**]: Failed to save session to cache.
+
+            - [group:**user**, code:**1200**]: Get user encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization encountered DB error:
+                  summary: Get organization encountered DB error.
+                  value:
+                    group: organization
+                    code: 1201
+                    message: Get organization encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/invitations/accept-invitation-by-key.md
+components:
+  schemas:
+    ErrStatusMsg:
+      type: object
+      properties:
+        group:
+          type: string
+          description: API function group\n -Will be "request" if there are invalid request parameters.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        code:
+          type: integer
+          description: The substatus error code for the API response.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        message:
+          type: string
+          description: The substatus error Message for API response.
+          x-go-type-skip-optional-pointer: true
+        traces:
+          type: array
+          items:
+            type: string
+          description: The original error messages.
+          x-go-type-skip-optional-pointer: true
+        validationDetail:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationDetail'
+          description: Returned when there are invalid request paremeters(group="request")\n List of invalid fields and the reason of error.
+          x-go-type-skip-optional-pointer: true
+      example:
+        group: request
+        code: 0
+        validationDetail:
+        - field: email
+          expression: required
+          originalValue: ''
+          reason: This field is required.
+      required:
+      - group
+      - code
+    ValidationDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the request data.
+          x-go-type-skip-optional-pointer: true
+        expression:
+          type: string
+          description: The form of violation.
+          x-go-type-skip-optional-pointer: true
+        argument:
+          type: string
+          description: The number or data to support the expression.
+          x-go-type-skip-optional-pointer: true
+        originalValue:
+          description: The original value from the request.
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          description: The reason for the validation error.
+          x-go-type-skip-optional-pointer: true
+      example:
+      - field: fieldXXX
+        expression: required
+        originalValue: ''
+        reason: This field is required.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "An access token used to authenticate a user and grant access to restricted APIs. It is issued by session APIs.\nFor status codes related to this header, refer to the \n[Common Headers Documentation](https://gmicloud.atlassian.net/wiki/spaces/CE/pages/47199534/Common+Headers#Authorization).\n"
+    bearerAPIKey:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'An API key used to authenticate a user and grant access to restricted models. It is issued by api-keys APIs.
+
+        '
+    bearerEmailVerificationToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'A token used to verify the validity of an email address.
+
+        It must be included in the Authorization header when verifying the email address.
+
+        '

@@ -1,0 +1,547 @@
+openapi: 3.2.0
+info:
+  contact:
+    email: support@gmicloud.ai
+  description: Cluster Engine API spec
+  title: Cluster Engine Baremetals API
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api
+security:
+- bearerAuth: []
+tags:
+- name: baremetals
+  description: GMI Bare metal management APIs for provisioning, configuring, and controlling physical server nodes. Handles server lifecycle management, hardware inventory, and status monitoring.
+paths:
+  /v1/baremetals:
+    post:
+      tags:
+      - baremetals
+      summary: Create baremetal servers
+      operationId: createBaremetals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaremetalReq'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UuidObject'
+                type: array
+          description: successful
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/baremetals/create-baremetal-servers.md
+    get:
+      tags:
+      - baremetals
+      summary: List all baremetal servers
+      operationId: listBaremetals
+      parameters:
+      - in: query
+        name: idc
+        schema:
+          $ref: '#/components/schemas/idcName'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BaremetalResp'
+                type: array
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/baremetals/list-all-baremetal-servers.md
+  /v1/baremetals/{id}:
+    delete:
+      tags:
+      - baremetals
+      summary: Delete baremetal server
+      operationId: deleteBaremetal
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/baremetals/delete-baremetal-server.md
+    get:
+      tags:
+      - baremetals
+      summary: Get baremetal server by ID
+      operationId: getBaremetal
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaremetalResp'
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/baremetals/get-baremetal-server-by-id.md
+    put:
+      tags:
+      - baremetals
+      summary: Update baremetal server
+      operationId: updateBaremetal
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+              required:
+              - name
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaremetalResp'
+          description: successful
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/baremetals/update-baremetal-server.md
+  /v1/baremetals/{id}/actions:
+    post:
+      tags:
+      - baremetals
+      summary: Execute baremetal server action
+      operationId: executeBaremetalAction
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                type:
+                  enum:
+                  - start
+                  - stop
+                  - powercycle
+                  - reboot
+                  type: string
+              required:
+              - type
+              type: object
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/baremetals/execute-baremetal-server-action.md
+  /v1/baremetals/products:
+    get:
+      tags:
+      - baremetals
+      summary: Get baremetal products
+      operationId: getBaremetalProducts
+      parameters:
+      - in: query
+        name: idc
+        schema:
+          $ref: '#/components/schemas/idcName'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/product'
+                type: array
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/baremetals/get-baremetal-products.md
+components:
+  schemas:
+    UuidList:
+      items:
+        format: uuid
+        type: string
+      type: array
+    name:
+      maxLength: 255
+      pattern: ^([A-Za-z0-9][A-Za-z0-9_\-. ]*)?[A-Za-z0-9]$
+      type: string
+    error:
+      properties:
+        code:
+          type: integer
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - reason
+      type: object
+    errorStatusMessage:
+      example:
+        code: 0
+        group: request
+        validationDetail:
+        - expression: required
+          field: userName
+          originalValue: ''
+          reason: This field is required.
+      properties:
+        code:
+          description: The substatus error code for the API response.
+          type: integer
+        group:
+          description: API function group. Will be "request" if there are invalid request parameters.
+          type: string
+        message:
+          description: The substatus error message for the API response.
+          type: string
+        traces:
+          description: The original error messages.
+          items:
+            type: string
+          type: array
+        validationDetail:
+          items:
+            $ref: '#/components/schemas/validationDetail'
+          type: array
+      required:
+      - group
+      - code
+      type: object
+    idcName:
+      maxLength: 50
+      pattern: ^[a-zA-Z0-9._-]+$
+      type: string
+    validationDetail:
+      example:
+        expression: required
+        field: userName
+        originalValue: ''
+        reason: This field is required.
+      properties:
+        argument:
+          description: Data supporting the expression.
+          type: string
+        expression:
+          description: The form of violation.
+          type: string
+        field:
+          description: The field of the request data.
+          type: string
+        originalValue:
+          description: The original value from the request.
+          type: string
+        reason:
+          description: The reason for the validation error.
+          type: string
+      type: object
+    BaremetalReq:
+      properties:
+        count:
+          minimum: 1
+          type: integer
+        enableZabbixAgent:
+          default: true
+          description: Whether to enable Zabbix agent on the baremetal node
+          type: boolean
+        idc:
+          $ref: '#/components/schemas/idcName'
+        imageId:
+          description: The ID of the image to use for creating the baremetal instance
+          format: uuid
+          type: string
+        internalIp:
+          description: Manually allocate internal IP address(IPv4 only). If not provided, internal IP will be allocated automatically. It only supports single baremetal creation.
+          maxLength: 15
+          minLength: 7
+          type: string
+        name:
+          $ref: '#/components/schemas/name'
+        product:
+          $ref: '#/components/schemas/productName'
+        sshKey:
+          minLength: 1
+          type: string
+        sshKeyIdList:
+          $ref: '#/components/schemas/UuidList'
+          description: The list of SSH key IDs to use for creating the baremetal instance
+      required:
+      - idc
+      - product
+      - name
+      - count
+      - imageId
+      type: object
+    productName:
+      maxLength: 256
+      pattern: ^[a-zA-Z0-9._-]+$
+      type: string
+    BaremetalNetworkAddr:
+      properties:
+        ip:
+          type: string
+        type:
+          enum:
+          - internal
+          - external
+          type: string
+      type: object
+    BaremetalResp:
+      properties:
+        associatedFirewalls:
+          $ref: '#/components/schemas/UuidList'
+        consoleReady:
+          type: boolean
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          format: uuid
+          type: string
+        idc:
+          $ref: '#/components/schemas/idcName'
+        image:
+          type: string
+        imageId:
+          format: uuid
+          type: string
+        name:
+          type: string
+        networks:
+          items:
+            $ref: '#/components/schemas/BaremetalNetworkAddr'
+          type: array
+        orgId:
+          format: uuid
+          type: string
+        product:
+          $ref: '#/components/schemas/productName'
+        reason:
+          description: The reason for the validation error.
+          type: string
+        status:
+          enum:
+          - creating
+          - deleted
+          - deleting
+          - error
+          - powercycling
+          - rebooting
+          - rebuilding
+          - running
+          - starting
+          - stopped
+          - stopping
+          - unknown
+          type: string
+      required:
+      - orgId
+      - idc
+      - id
+      - name
+      - status
+      - networks
+      - image
+      - imageId
+      - product
+      - associatedFirewalls
+      - createdAt
+      - consoleReady
+      type: object
+    UuidObject:
+      properties:
+        id:
+          format: uuid
+          type: string
+      required:
+      - id
+      type: object
+    productType:
+      enum:
+      - Container
+      - BareMetal
+      - Storage
+      - EIP
+      type: string
+    product:
+      properties:
+        gpuModel:
+          type: string
+        idc:
+          type: string
+        name:
+          type: string
+        price:
+          type: integer
+        productLine:
+          description: product line for categorization
+          type: string
+        spec:
+          type: object
+        type:
+          $ref: '#/components/schemas/productType'
+        valid:
+          type: boolean
+      required:
+      - idc
+      - name
+      - type
+      - price
+      - valid
+      - spec
+      type: object
+  responses:
+    Done:
+      content:
+        application/json:
+          example:
+            result: container 12345678-1234-2234-3234-xxxxxxxxxxxxxx has been restarted
+          schema:
+            properties:
+              result:
+                type: string
+            required:
+            - result
+            type: object
+      description: An action completed successfully
+    NotFound:
+      content:
+        application/json:
+          example:
+            reason: resource 12345678-1234-2234-3234-xxxxxxxxxxxxxx was not found
+          schema:
+            $ref: '#/components/schemas/error'
+      description: The specified resource was not found
+    ServiceUnavailable:
+      content:
+        application/json:
+          example:
+            reason: database is unavailable
+          schema:
+            $ref: '#/components/schemas/error'
+      description: a dependent service is unavailable
+    Unauthorized:
+      content:
+        application/json:
+          examples:
+            Expired access token.:
+              summary: Expired access token.
+              value:
+                code: 1
+                group: auth_verify
+                message: Expired access token.
+            Invalid access token.:
+              summary: Invalid access token.
+              value:
+                code: 0
+                group: auth_verify
+                message: Invalid access token.
+          schema:
+            $ref: '#/components/schemas/errorStatusMessage'
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+    BadRequest:
+      content:
+        application/json:
+          example:
+            reason: resources.CPU is a required property
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/error'
+            - $ref: '#/components/schemas/errorStatusMessage'
+      description: bad request
+    InternalServerError:
+      content:
+        application/json:
+          example:
+            reason: An error occurred in the kubernetes cluster
+          schema:
+            $ref: '#/components/schemas/error'
+      description: Internal Server Error
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

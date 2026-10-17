@@ -1,0 +1,449 @@
+openapi: 3.2.0
+info:
+  title: GMI Sandbox Sandbox Exec API
+  description: 'REST API for GMI Sandbox: create isolated execution environments from templates, manage their lifecycle on the control plane, and run commands or transfer files through each sandbox''s own data plane.'
+  contact:
+    name: GMI Cloud Support
+    email: support@gmicloud.ai
+  version: '2.0'
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v2
+  description: Control plane
+security:
+- bearerAuth: []
+tags:
+- name: Sandbox-Exec
+  description: Sandbox execution data plane (accessed via the sandbox host and sandbox access token). These endpoints are not under the control plane's `/api/v2` path; clients connect directly to `https://{sandbox_key}.{domain}` and authenticate with `X-Access-Token`.
+paths:
+  /executions/{execution_id}/cancel:
+    servers:
+    - url: https://{sandbox_key}.{domain}
+      description: 'Sandbox data-plane entry point. Both variables come from the create/connect response: `sandbox_key` is `data.sandbox_key`, `domain` is `data.domain`.
+
+        '
+      variables:
+        sandbox_key:
+          default: sandbox-key
+          description: Sandbox key (the `sandbox_key` returned by the create/connect endpoints)
+        domain:
+          default: sandbox.example.com
+          description: 'The `domain` returned verbatim by the create/connect endpoints. Its default naming shape is `{idc-name}.{root-hostname}`, but clients must not assemble or derive it themselves.
+
+            '
+    post:
+      tags:
+      - Sandbox-Exec
+      summary: Cancel a sandbox execution
+      description: 'Requests cancellation of a non-terminal execution. Cancellation is idempotent:
+
+        repeated calls return the terminal canceled result after the provider confirms it.'
+      operationId: cancelSandboxExecution
+      parameters:
+      - $ref: '#/components/parameters/SandboxExecExecutionIDParam'
+      - $ref: '#/components/parameters/SandboxExecRequestIDParam'
+      responses:
+        '200':
+          description: Execution was already canceled and is now returned as terminal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxExecResultResponse'
+        '202':
+          description: Cancellation accepted or submitted to the provider.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxExecAcceptedResponse'
+        '400':
+          $ref: '#/components/responses/SandboxExecBadRequest'
+        '401':
+          $ref: '#/components/responses/SandboxExecUnauthorized'
+        '404':
+          $ref: '#/components/responses/SandboxExecNotFound'
+        '409':
+          $ref: '#/components/responses/SandboxExecConflict'
+        '429':
+          $ref: '#/components/responses/SandboxExecRateLimited'
+        '500':
+          $ref: '#/components/responses/SandboxExecInternalError'
+      security:
+      - sandboxAccessToken: []
+      servers:
+      - url: https://{sandbox_key}.{domain}
+        description: Sandbox data-plane host
+        variables:
+          sandbox_key:
+            default: sandbox-key
+            description: Data-plane addressing key (`sandbox_key` from the control-plane response).
+          domain:
+            default: sandbox.example.com
+            description: Sandbox data-plane domain from the control-plane response.
+      x-source: https://docs.gmicloud.ai/api-reference/sandbox-exec/cancel-a-sandbox-execution.md
+  /executions:
+    servers:
+    - url: https://{sandbox_key}.{domain}
+      description: 'Sandbox data-plane entry point. Both variables come from the create/connect response: `sandbox_key` is `data.sandbox_key`, `domain` is `data.domain`.
+
+        '
+      variables:
+        sandbox_key:
+          default: sandbox-key
+          description: Sandbox key (the `sandbox_key` returned by the create/connect endpoints)
+        domain:
+          default: sandbox.example.com
+          description: 'The `domain` returned verbatim by the create/connect endpoints. Its default naming shape is `{idc-name}.{root-hostname}`, but clients must not assemble or derive it themselves.
+
+            '
+    post:
+      tags:
+      - Sandbox-Exec
+      summary: Execute a command in a sandbox
+      description: 'Starts an asynchronous shell execution in the sandbox. The request body keeps the
+
+        `action=exec` and `parameters` shape used by the runtime contract. The effective URL is
+
+        the sandbox data-plane host; the sandbox ID is obtained from the leftmost Host label and
+
+        is not repeated in the path. The endpoint does not include the control-plane `/api/v2` prefix.
+
+        When `wait=true`, the server waits for a terminal result for at most
+
+        `wait_timeout_seconds` seconds; a timeout returns `202` without canceling the execution.'
+      operationId: createSandboxExecution
+      parameters:
+      - $ref: '#/components/parameters/SandboxExecRequestIDParam'
+      - $ref: '#/components/parameters/SandboxExecWaitParam'
+      - $ref: '#/components/parameters/SandboxExecWaitTimeoutParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxExecRequest'
+            example:
+              action: exec
+              parameters:
+                command: printf '%s\n' "$APP_ENV"
+                envs:
+                  APP_ENV: production
+                cwd: /workspace
+      responses:
+        '200':
+          description: Execution completed within the requested wait window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxExecResultResponse'
+        '202':
+          description: Execution accepted, or still running when the wait window expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxExecAcceptedResponse'
+        '400':
+          $ref: '#/components/responses/SandboxExecBadRequest'
+        '401':
+          $ref: '#/components/responses/SandboxExecUnauthorized'
+        '429':
+          $ref: '#/components/responses/SandboxExecRateLimited'
+        '500':
+          $ref: '#/components/responses/SandboxExecInternalError'
+      security:
+      - sandboxAccessToken: []
+      servers:
+      - url: https://{sandbox_key}.{domain}
+        description: Sandbox data-plane host
+        variables:
+          sandbox_key:
+            default: sandbox-key
+            description: Data-plane addressing key (`sandbox_key` from the control-plane response).
+          domain:
+            default: sandbox.example.com
+            description: Sandbox data-plane domain from the control-plane response.
+      x-source: https://docs.gmicloud.ai/api-reference/sandbox-exec/execute-a-command-in-a-sandbox.md
+  /executions/{execution_id}:
+    servers:
+    - url: https://{sandbox_key}.{domain}
+      description: 'Sandbox data-plane entry point. Both variables come from the create/connect response: `sandbox_key` is `data.sandbox_key`, `domain` is `data.domain`.
+
+        '
+      variables:
+        sandbox_key:
+          default: sandbox-key
+          description: Sandbox key (the `sandbox_key` returned by the create/connect endpoints)
+        domain:
+          default: sandbox.example.com
+          description: 'The `domain` returned verbatim by the create/connect endpoints. Its default naming shape is `{idc-name}.{root-hostname}`, but clients must not assemble or derive it themselves.
+
+            '
+    get:
+      tags:
+      - Sandbox-Exec
+      summary: Get a sandbox execution
+      operationId: getSandboxExecution
+      parameters:
+      - $ref: '#/components/parameters/SandboxExecExecutionIDParam'
+      - $ref: '#/components/parameters/SandboxExecRequestIDParam'
+      responses:
+        '200':
+          description: Current execution status and any available output.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxExecResultResponse'
+        '400':
+          $ref: '#/components/responses/SandboxExecBadRequest'
+        '401':
+          $ref: '#/components/responses/SandboxExecUnauthorized'
+        '404':
+          $ref: '#/components/responses/SandboxExecNotFound'
+        '429':
+          $ref: '#/components/responses/SandboxExecRateLimited'
+        '500':
+          $ref: '#/components/responses/SandboxExecInternalError'
+      security:
+      - sandboxAccessToken: []
+      servers:
+      - url: https://{sandbox_key}.{domain}
+        description: Sandbox data-plane host
+        variables:
+          sandbox_key:
+            default: sandbox-key
+            description: Data-plane addressing key (`sandbox_key` from the control-plane response).
+          domain:
+            default: sandbox.example.com
+            description: Sandbox data-plane domain from the control-plane response.
+      x-source: https://docs.gmicloud.ai/api-reference/sandbox-exec/get-a-sandbox-execution.md
+components:
+  responses:
+    SandboxExecConflict:
+      description: The execution is already terminal and cannot be canceled.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxExecErrorResponse'
+    SandboxExecUnauthorized:
+      description: Missing or invalid X-Access-Token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxExecErrorResponse'
+    SandboxExecInternalError:
+      description: The execution provider or proxy failed to complete the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxExecErrorResponse'
+    SandboxExecNotFound:
+      description: Execution does not exist or is not owned by this sandbox.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxExecErrorResponse'
+    SandboxExecBadRequest:
+      description: Invalid execution request or query parameter.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxExecErrorResponse'
+    SandboxExecRateLimited:
+      description: The execution provider rate-limited the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SandboxExecErrorResponse'
+  schemas:
+    SandboxExecStatus:
+      type: string
+      description: Public lifecycle status of a sandbox execution.
+      enum:
+      - pending
+      - running
+      - canceling
+      - succeeded
+      - failed
+      - canceled
+    SandboxExecResultResponse:
+      type: object
+      required:
+      - execution_id
+      - sandbox_id
+      - status
+      - exit_code
+      - stdout
+      - stderr
+      - stdout_truncated
+      - stderr_truncated
+      - started_at
+      - completed_at
+      properties:
+        request_id:
+          type: string
+          description: Echo of X-Request-ID when supplied.
+        execution_id:
+          type: string
+          format: uuid
+        sandbox_id:
+          type: string
+          description: Echo of the data-plane addressing key (i.e. `sandbox_key`; the data plane identifies the instance by the key in the host).
+        status:
+          $ref: '#/components/schemas/SandboxExecStatus'
+        exit_code:
+          type:
+          - integer
+          - 'null'
+          format: int32
+          description: Process exit code; null while non-terminal or when canceled.
+        stdout:
+          type:
+          - string
+          - 'null'
+          description: Captured standard output, or null while not yet available.
+        stderr:
+          type:
+          - string
+          - 'null'
+          description: Captured standard error, or null while not yet available.
+        stdout_truncated:
+          type:
+          - boolean
+          - 'null'
+        stderr_truncated:
+          type:
+          - boolean
+          - 'null'
+        started_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        completed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    SandboxExecErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: Machine-readable execution error code.
+          example: Execution.InvalidRequest
+        message:
+          type: string
+          description: Sanitized human-readable error message.
+        request_id:
+          type: string
+          description: Request correlation identifier.
+        details:
+          type: object
+          additionalProperties: true
+    SandboxExecAcceptedResponse:
+      type: object
+      required:
+      - execution_id
+      - sandbox_id
+      - status
+      properties:
+        request_id:
+          type: string
+          description: Echo of X-Request-ID when supplied.
+        execution_id:
+          type: string
+          format: uuid
+          description: Public execution identifier.
+        sandbox_id:
+          type: string
+          description: Echo of the data-plane addressing key (i.e. `sandbox_key`; the data plane identifies the instance by the key in the host).
+        status:
+          $ref: '#/components/schemas/SandboxExecStatus'
+    SandboxExecRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - action
+      - parameters
+      properties:
+        action:
+          type: string
+          enum:
+          - exec
+          description: Execution action. The sealed data plane currently supports exec only.
+        parameters:
+          type: object
+          additionalProperties: false
+          required:
+          - command
+          properties:
+            command:
+              type: string
+              description: Shell command to execute.
+            envs:
+              type: object
+              additionalProperties:
+                type: string
+              description: Environment variables for the command.
+            cwd:
+              type: string
+              description: Absolute working directory. Defaults to `/home/user`.
+  parameters:
+    SandboxExecRequestIDParam:
+      name: X-Request-ID
+      in: header
+      required: false
+      description: Optional request correlation identifier echoed in the response.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+    SandboxExecWaitTimeoutParam:
+      name: wait_timeout_seconds
+      in: query
+      required: false
+      description: 'Maximum time to wait when `wait=true`, in seconds. Values from 1 through 25
+
+        are accepted. A wait timeout never cancels the execution.
+
+        '
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 25
+        default: 25
+    SandboxExecExecutionIDParam:
+      name: execution_id
+      in: path
+      required: true
+      description: Public execution identifier returned by the create operation.
+      schema:
+        type: string
+        format: uuid
+    SandboxExecWaitParam:
+      name: wait
+      in: query
+      required: false
+      description: Wait for a terminal result before responding. Defaults to false.
+      schema:
+        type: boolean
+        default: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API Key or Access Token, always sent as `Authorization: Bearer <token>`. The gateway recognizes the token type automatically.
+
+        '
+    sandboxAccessToken:
+      type: apiKey
+      in: header
+      name: X-Access-Token
+      description: 'Sandbox data-plane token — the `sandbox_access_token` returned by the create/connect endpoints. Used for `/files`, Sandbox-Exec, and other data-plane endpoints; the control plane (`/api/v2`) does not accept it, and conversely the control plane''s `Authorization: Bearer` is invalid on the data plane.
+
+
+        The token is bound to its sandbox: using sandbox A''s token against sandbox B''s host fails. It stays valid until the sandbox''s lifetime ends; there is no separate rotation endpoint (`rotate_traffic_token` rotates the port traffic token `traffic_access_token` and does not affect this one).
+
+        '

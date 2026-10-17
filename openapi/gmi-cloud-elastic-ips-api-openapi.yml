@@ -1,0 +1,521 @@
+openapi: 3.2.0
+info:
+  contact:
+    email: support@gmicloud.ai
+  description: Cluster Engine API spec
+  title: Cluster Engine Elastic Ips API
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api
+security:
+- bearerAuth: []
+tags:
+- name: elastic-ips
+  description: GMI Elastic IP address management APIs for allocating, associating, and managing public IP addresses.
+paths:
+  /v1/elastic-ips:
+    post:
+      tags:
+      - elastic-ips
+      summary: Allocate elastic IP for organization
+      operationId: allocateElasticIP
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/elasticIPAllocateReq'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UuidObject'
+                type: array
+          description: successful
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/elastic-ips/allocate-elastic-ip-for-organization.md
+    get:
+      tags:
+      - elastic-ips
+      summary: Get elastic IP
+      operationId: listElasticIP
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/elasticIPResp'
+                type: array
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/elastic-ips/get-elastic-ip.md
+  /v1/elastic-ips/{id}/associate:
+    post:
+      tags:
+      - elastic-ips
+      summary: Associate elastic IP with instance
+      operationId: associateElasticIP
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/elasticIPAssociateConfig'
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/elastic-ips/associate-elastic-ip-with-instance.md
+  /v1/elastic-ips/{id}/disassociate:
+    post:
+      tags:
+      - elastic-ips
+      summary: Disassociate elastic IP from instance
+      operationId: disassociateElasticIP
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/elastic-ips/disassociate-elastic-ip-from-instance.md
+  /v1/elastic-ips/{id}:
+    get:
+      tags:
+      - elastic-ips
+      summary: Get elastic IP
+      operationId: getElasticIP
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/elasticIPResp'
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/elastic-ips/get-elastic-ip-1.md
+    delete:
+      tags:
+      - elastic-ips
+      summary: Release elastic IP
+      operationId: releaseElasticIP
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/elastic-ips/release-elastic-ip.md
+  /v1/elastic-ips/products:
+    get:
+      tags:
+      - elastic-ips
+      summary: Get elastic IP products
+      operationId: getElasticIPProducts
+      parameters:
+      - in: query
+        name: idc
+        schema:
+          $ref: '#/components/schemas/idcName'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/product'
+                type: array
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/elastic-ips/get-elastic-ip-products.md
+components:
+  schemas:
+    name:
+      maxLength: 255
+      pattern: ^([A-Za-z0-9][A-Za-z0-9_\-. ]*)?[A-Za-z0-9]$
+      type: string
+    error:
+      properties:
+        code:
+          type: integer
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - reason
+      type: object
+    elasticIPAllocateReq:
+      properties:
+        count:
+          default: 1
+          minimum: 1
+          type: integer
+        idc:
+          $ref: '#/components/schemas/idcName'
+        name:
+          $ref: '#/components/schemas/name'
+          description: Name of the elastic IP
+        product:
+          $ref: '#/components/schemas/productName'
+      required:
+      - idc
+      - count
+      - name
+      - product
+      type: object
+    instanceType:
+      enum:
+      - baremetal
+      - container
+      type:
+      - string
+      - 'null'
+    errorStatusMessage:
+      example:
+        code: 0
+        group: request
+        validationDetail:
+        - expression: required
+          field: userName
+          originalValue: ''
+          reason: This field is required.
+      properties:
+        code:
+          description: The substatus error code for the API response.
+          type: integer
+        group:
+          description: API function group. Will be "request" if there are invalid request parameters.
+          type: string
+        message:
+          description: The substatus error message for the API response.
+          type: string
+        traces:
+          description: The original error messages.
+          items:
+            type: string
+          type: array
+        validationDetail:
+          items:
+            $ref: '#/components/schemas/validationDetail'
+          type: array
+      required:
+      - group
+      - code
+      type: object
+    idcName:
+      maxLength: 50
+      pattern: ^[a-zA-Z0-9._-]+$
+      type: string
+    validationDetail:
+      example:
+        expression: required
+        field: userName
+        originalValue: ''
+        reason: This field is required.
+      properties:
+        argument:
+          description: Data supporting the expression.
+          type: string
+        expression:
+          description: The form of violation.
+          type: string
+        field:
+          description: The field of the request data.
+          type: string
+        originalValue:
+          description: The original value from the request.
+          type: string
+        reason:
+          description: The reason for the validation error.
+          type: string
+      type: object
+    productName:
+      maxLength: 256
+      pattern: ^[a-zA-Z0-9._-]+$
+      type: string
+    elasticIPAssociateConfig:
+      properties:
+        instanceID:
+          description: set instanceID and instanceType to associate the elastic IP to the instance, set to null to disassociate the elastic IP from the instance
+          format: uuid
+          type:
+          - string
+          - 'null'
+        instanceType:
+          $ref: '#/components/schemas/instanceType'
+      type: object
+    UuidObject:
+      properties:
+        id:
+          format: uuid
+          type: string
+      required:
+      - id
+      type: object
+    productType:
+      enum:
+      - Container
+      - BareMetal
+      - Storage
+      - EIP
+      type: string
+    elasticIPConfig:
+      properties:
+        internetConnectionType:
+          default: Dual-Homed
+          enum:
+          - BGP
+          - Dual-Homed
+          type: string
+        maxBandwidth:
+          default: 100 Gbps
+          maxLength: 1048576
+          minLength: 1
+          type: string
+        name:
+          $ref: '#/components/schemas/name'
+          description: Name of the elastic IP
+      required:
+      - name
+      - internetConnectionType
+      - maxBandwidth
+      type: object
+    product:
+      properties:
+        gpuModel:
+          type: string
+        idc:
+          type: string
+        name:
+          type: string
+        price:
+          type: integer
+        productLine:
+          description: product line for categorization
+          type: string
+        spec:
+          type: object
+        type:
+          $ref: '#/components/schemas/productType'
+        valid:
+          type: boolean
+      required:
+      - idc
+      - name
+      - type
+      - price
+      - valid
+      - spec
+      type: object
+    elasticIP:
+      allOf:
+      - $ref: '#/components/schemas/elasticIPConfig'
+      - properties:
+          idc:
+            $ref: '#/components/schemas/idcName'
+          ipAddress:
+            description: IP address of the elastic IP. The longest possible IPv6 address is 39 characters
+            maxLength: 39
+            minLength: 7
+            type: string
+          product:
+            $ref: '#/components/schemas/productName'
+        required:
+        - idc
+        - ipAddress
+        - product
+        type: object
+    elasticIPResp:
+      allOf:
+      - properties:
+          id:
+            format: uuid
+            type: string
+          orgId:
+            description: if nil, it means the elastic IP is not associated with any instance
+            format: uuid
+            type: string
+          status:
+            enum:
+            - released
+            - associated
+            - disassociated
+            type: string
+        required:
+        - orgId
+        - id
+        - status
+        type: object
+      - $ref: '#/components/schemas/elasticIP'
+      - $ref: '#/components/schemas/elasticIPAssociateConfig'
+      type: object
+  responses:
+    Done:
+      content:
+        application/json:
+          example:
+            result: container 12345678-1234-2234-3234-xxxxxxxxxxxxxx has been restarted
+          schema:
+            properties:
+              result:
+                type: string
+            required:
+            - result
+            type: object
+      description: An action completed successfully
+    NotFound:
+      content:
+        application/json:
+          example:
+            reason: resource 12345678-1234-2234-3234-xxxxxxxxxxxxxx was not found
+          schema:
+            $ref: '#/components/schemas/error'
+      description: The specified resource was not found
+    ServiceUnavailable:
+      content:
+        application/json:
+          example:
+            reason: database is unavailable
+          schema:
+            $ref: '#/components/schemas/error'
+      description: a dependent service is unavailable
+    Unauthorized:
+      content:
+        application/json:
+          examples:
+            Expired access token.:
+              summary: Expired access token.
+              value:
+                code: 1
+                group: auth_verify
+                message: Expired access token.
+            Invalid access token.:
+              summary: Invalid access token.
+              value:
+                code: 0
+                group: auth_verify
+                message: Invalid access token.
+          schema:
+            $ref: '#/components/schemas/errorStatusMessage'
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+    BadRequest:
+      content:
+        application/json:
+          example:
+            reason: resources.CPU is a required property
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/error'
+            - $ref: '#/components/schemas/errorStatusMessage'
+      description: bad request
+    InternalServerError:
+      content:
+        application/json:
+          example:
+            reason: An error occurred in the kubernetes cluster
+          schema:
+            $ref: '#/components/schemas/error'
+      description: Internal Server Error
+    Conflict:
+      content:
+        application/json:
+          example:
+            reason: timestamp mismatched
+          schema:
+            $ref: '#/components/schemas/error'
+      description: request failed due to a conflict create or update
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

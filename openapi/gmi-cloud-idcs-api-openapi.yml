@@ -1,0 +1,185 @@
+openapi: 3.2.0
+info:
+  title: IDC Service Idcs API
+  description: APIs for IDC Service.
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v1
+  description: IDC Service API
+security: []
+tags:
+- name: idcs
+paths:
+  /idcs:
+    get:
+      tags:
+      - idcs
+      summary: List all IDCs
+      description: Retrieves a list of IDC information that are not marked as hidden.
+      operationId: listIDCs
+      responses:
+        '200':
+          description: Successfully retrieved the list of IDCs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listIDCsResponse'
+        '500':
+          description: '- [group:**idc**, code:**1201**]: Get IDC list encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get IDC list encountered DB error:
+                  summary: Get IDC list encountered DB error.
+                  value:
+                    group: idc
+                    code: 1201
+                    message: Get IDC list encountered DB error.
+                    traces:
+                    - DB error occurred.
+      x-source: https://docs.gmicloud.ai/api-reference/idcs/list-all-idcs.md
+components:
+  schemas:
+    ValidationDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the request data.
+          x-go-type-skip-optional-pointer: true
+        expression:
+          type: string
+          description: The form of violation.
+          x-go-type-skip-optional-pointer: true
+        argument:
+          type: string
+          description: The number or data to support the expression.
+          x-go-type-skip-optional-pointer: true
+        originalValue:
+          description: The original value from the request.
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          description: The reason for the validation error.
+          x-go-type-skip-optional-pointer: true
+      example:
+      - field: fieldXXX
+        expression: required
+        originalValue: ''
+        reason: This field is required.
+    idcInfo:
+      type: object
+      description: Information about the IDC.
+      properties:
+        idcId:
+          type: string
+          description: The unique identifier for the IDC
+          example: us-denver-1
+        name:
+          type: string
+          description: The IDC name.
+          example: Denver IDC-1
+        country:
+          type: string
+          description: The country where the IDC is located, represented by the ISO 3166-1 alpha-2 country code.
+          example: US
+        countrySubdivision:
+          type: string
+          description: The subdivision of the country where the IDC is located, represented by the ISO 3166-2 code.
+          example: US-CO
+        status:
+          type: string
+          description: The IDC status.
+          enum:
+          - available
+          - full
+          - maintenance
+          x-go-type: ceCommonLibTypes.IdsIDCStatus
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/ce-common-lib-go/pkg/types
+            name: ceCommonLibTypes
+          example: available
+      required:
+      - idcId
+      - name
+      - country
+      - countrySubdivision
+      - status
+    ErrStatusMsg:
+      type: object
+      properties:
+        group:
+          type: string
+          description: API function group\n -Will be "request" if there are invalid request parameters.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        code:
+          type: integer
+          description: The substatus error code for the API response.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        message:
+          type: string
+          description: The substatus error Message for API response.
+          x-go-type-skip-optional-pointer: true
+        traces:
+          type: array
+          items:
+            type: string
+          description: The original error messages.
+          x-go-type-skip-optional-pointer: true
+        validationDetail:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationDetail'
+          description: Returned when there are invalid request paremeters(group="request")\n List of invalid fields and the reason of error.
+          x-go-type-skip-optional-pointer: true
+      example:
+        group: request
+        code: 0
+        validationDetail:
+        - field: email
+          expression: required
+          originalValue: ''
+          reason: This field is required.
+      required:
+      - group
+      - code
+    listIDCsResponse:
+      type: object
+      x-go-name: listIDCsResponse
+      properties:
+        idcs:
+          type: array
+          description: A list of IDCs.
+          items:
+            $ref: '#/components/schemas/idcInfo'
+      required:
+      - idcs
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "An access token used to authenticate a user and grant access to restricted APIs. It is issued by session APIs.\nFor status codes related to this header, refer to the \n[Common Headers Documentation](https://gmicloud.atlassian.net/wiki/spaces/CE/pages/47199534/Common+Headers#Authorization).\n"
+    bearerAPIKey:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'An API key used to authenticate a user and grant access to restricted models. It is issued by api-keys APIs.
+
+        '
+    bearerEmailVerificationToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'A token used to verify the validity of an email address.
+
+        It must be included in the Authorization header when verifying the email address.
+
+        '

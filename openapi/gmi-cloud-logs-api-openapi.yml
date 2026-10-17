@@ -1,0 +1,165 @@
+openapi: 3.2.0
+info:
+  contact:
+    email: support@gmicloud.ai
+  description: Cluster Engine API spec
+  title: Cluster Engine Logs API
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api
+security:
+- bearerAuth: []
+tags:
+- name: Logs
+paths:
+  /v1/containers/{id}/logs:
+    get:
+      tags:
+      - Logs
+      summary: Download container logs
+      operationId: downloadLog
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: log string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/containers/download-container-logs.md
+components:
+  schemas:
+    errorStatusMessage:
+      example:
+        code: 0
+        group: request
+        validationDetail:
+        - expression: required
+          field: userName
+          originalValue: ''
+          reason: This field is required.
+      properties:
+        code:
+          description: The substatus error code for the API response.
+          type: integer
+        group:
+          description: API function group. Will be "request" if there are invalid request parameters.
+          type: string
+        message:
+          description: The substatus error message for the API response.
+          type: string
+        traces:
+          description: The original error messages.
+          items:
+            type: string
+          type: array
+        validationDetail:
+          items:
+            $ref: '#/components/schemas/validationDetail'
+          type: array
+      required:
+      - group
+      - code
+      type: object
+    error:
+      properties:
+        code:
+          type: integer
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - reason
+      type: object
+    validationDetail:
+      example:
+        expression: required
+        field: userName
+        originalValue: ''
+        reason: This field is required.
+      properties:
+        argument:
+          description: Data supporting the expression.
+          type: string
+        expression:
+          description: The form of violation.
+          type: string
+        field:
+          description: The field of the request data.
+          type: string
+        originalValue:
+          description: The original value from the request.
+          type: string
+        reason:
+          description: The reason for the validation error.
+          type: string
+      type: object
+  responses:
+    NotFound:
+      content:
+        application/json:
+          example:
+            reason: resource 12345678-1234-2234-3234-xxxxxxxxxxxxxx was not found
+          schema:
+            $ref: '#/components/schemas/error'
+      description: The specified resource was not found
+    ServiceUnavailable:
+      content:
+        application/json:
+          example:
+            reason: database is unavailable
+          schema:
+            $ref: '#/components/schemas/error'
+      description: a dependent service is unavailable
+    Unauthorized:
+      content:
+        application/json:
+          examples:
+            Expired access token.:
+              summary: Expired access token.
+              value:
+                code: 1
+                group: auth_verify
+                message: Expired access token.
+            Invalid access token.:
+              summary: Invalid access token.
+              value:
+                code: 0
+                group: auth_verify
+                message: Invalid access token.
+          schema:
+            $ref: '#/components/schemas/errorStatusMessage'
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+    InternalServerError:
+      content:
+        application/json:
+          example:
+            reason: An error occurred in the kubernetes cluster
+          schema:
+            $ref: '#/components/schemas/error'
+      description: Internal Server Error
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

@@ -1,0 +1,207 @@
+openapi: 3.2.0
+info:
+  title: IDC Service OAuth API
+  description: APIs for IDC Service.
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v1
+  description: IDC Service API
+security: []
+tags:
+- name: OAuth
+paths:
+  /oauth/token:
+    post:
+      tags:
+      - OAuth
+      summary: Exchange authorization code for access token
+      description: Exchanges an authorization code for an access token.
+      operationId: exchangeAuthorizationCode
+      requestBody:
+        description: The request body for exchanging authorization code.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exchangeAuthorizationCodeRequest'
+      responses:
+        '200':
+          description: Successfully exchanged authorization code for access token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exchangeAuthorizationCodeResponse'
+        '400':
+          description: '- [group:**oauth**, code:**0**]: Unsupported OAuth provider.
+
+            - [group:**oauth**, code:**2**]: Invalid authorization code.
+
+            - [group:**request**, code:**0**]: Invalid field in the request.
+
+            - [group:**request**, code:**1**]: The request body is required.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: code
+                      expression: required
+                      originalValue: ''
+                      reason: This field is required.
+        '500':
+          description: '- [group:**oauth**, code:**1200**]: Exchange authorization code encountered error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Exchange authorization code encountered error:
+                  summary: Exchange authorization code encountered error.
+                  value:
+                    group: oauth
+                    code: 1200
+                    message: Exchange authorization code encountered error.
+                    traces:
+                    - error occurred.
+      x-source: https://docs.gmicloud.ai/api-reference/oauth/exchange-authorization-code-for-access-token.md
+components:
+  schemas:
+    ErrStatusMsg:
+      type: object
+      properties:
+        group:
+          type: string
+          description: API function group\n -Will be "request" if there are invalid request parameters.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        code:
+          type: integer
+          description: The substatus error code for the API response.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        message:
+          type: string
+          description: The substatus error Message for API response.
+          x-go-type-skip-optional-pointer: true
+        traces:
+          type: array
+          items:
+            type: string
+          description: The original error messages.
+          x-go-type-skip-optional-pointer: true
+        validationDetail:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationDetail'
+          description: Returned when there are invalid request paremeters(group="request")\n List of invalid fields and the reason of error.
+          x-go-type-skip-optional-pointer: true
+      example:
+        group: request
+        code: 0
+        validationDetail:
+        - field: email
+          expression: required
+          originalValue: ''
+          reason: This field is required.
+      required:
+      - group
+      - code
+    ValidationDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the request data.
+          x-go-type-skip-optional-pointer: true
+        expression:
+          type: string
+          description: The form of violation.
+          x-go-type-skip-optional-pointer: true
+        argument:
+          type: string
+          description: The number or data to support the expression.
+          x-go-type-skip-optional-pointer: true
+        originalValue:
+          description: The original value from the request.
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          description: The reason for the validation error.
+          x-go-type-skip-optional-pointer: true
+      example:
+      - field: fieldXXX
+        expression: required
+        originalValue: ''
+        reason: This field is required.
+    exchangeAuthorizationCodeResponse:
+      type: object
+      x-go-name: exchangeAuthorizationCodeResponse
+      properties:
+        accessToken:
+          type: string
+          description: The OAuth access token that can be used to access the provider's API.
+          example: ya29.a0AfH6SMB...
+      required:
+      - accessToken
+    exchangeAuthorizationCodeRequest:
+      type: object
+      x-go-name: exchangeAuthorizationCodeRequest
+      properties:
+        provider:
+          type: string
+          description: 'The OAuth provider name.
+
+            - "github": GitHub OAuth.
+
+            '
+          enum:
+          - github
+          example: github
+          x-go-type: iamLibTypes.OAuthProvider
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/iam-lib-go/pkg/types
+            name: iamLibTypes
+          x-oapi-codegen-extra-tags:
+            binding: required
+        code:
+          type: string
+          description: The OAuth authorization code received from the OAuth callback.
+          example: abc123def456
+          x-oapi-codegen-extra-tags:
+            binding: required
+      required:
+      - provider
+      - code
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "An access token used to authenticate a user and grant access to restricted APIs. It is issued by session APIs.\nFor status codes related to this header, refer to the \n[Common Headers Documentation](https://gmicloud.atlassian.net/wiki/spaces/CE/pages/47199534/Common+Headers#Authorization).\n"
+    bearerAPIKey:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'An API key used to authenticate a user and grant access to restricted models. It is issued by api-keys APIs.
+
+        '
+    bearerEmailVerificationToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'A token used to verify the validity of an email address.
+
+        It must be included in the Authorization header when verifying the email address.
+
+        '

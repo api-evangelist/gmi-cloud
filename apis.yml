@@ -92,17 +92,28 @@ common:
 - type: Login
   url: https://console.gmicloud.ai/
 apis:
-- aid: gmi-cloud:cluster-engine-api
-  name: GMI Cloud Cluster Engine API
-  description: Manage users, organizations, API keys, SSH keys, containers and cluster
-    resources on GMI Cloud.
+- aid: gmi-cloud:inference-api
+  name: GMI Cloud Inference Engine API
+  description: >-
+    OpenAI-compatible inference endpoints (GET /v1/models, POST /v1/chat/completions) plus video inference;
+    no machine-readable contract published.
+  humanURL: https://docs.gmicloud.ai/inference-engine/api-reference/llm-api-reference
+  baseURL: https://api.gmi-serving.com/v1
+  tags:
+  - GMI Cloud
+  properties: []
+- aid: gmi-cloud:gmi-cloud-baremetals-api
+  name: GMI Cloud Baremetals API
+  description: >-
+    GMI Bare metal management APIs for provisioning, configuring, and controlling physical server nodes.
+    Handles server lifecycle management, hardware inventory, and status monitoring.
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
-  - GMI Cloud
+  - baremetals
   properties:
   - type: OpenAPI
-    url: openapi/gmi-cloud-cluster-engine-openapi.yml
+    url: openapi/gmi-cloud-baremetals-api-openapi.yml
   - type: JSONSchema
     url: json-schema/gmi-cloud-containers-resp-schema.json
   - type: JSONSchema
@@ -115,17 +126,6 @@ apis:
     url: json-schema/gmi-cloud-firewall-resp-schema.json
   - type: JSONSchema
     url: json-schema/gmi-cloud-elastic-ipresp-schema.json
-- aid: gmi-cloud:idc-service-api
-  name: GMI Cloud IDC Service API
-  description: Bare-metal instances, VPCs, elastic IPs and related infrastructure
-    in GMI Cloud data centers.
-  humanURL: https://docs.gmicloud.ai/api-reference/introduction
-  baseURL: https://console.gmicloud.ai/api/v1
-  tags:
-  - GMI Cloud
-  properties:
-  - type: OpenAPI
-    url: openapi/gmi-cloud-idc-service-openapi.yml
   - type: JSONSchema
     url: json-schema/gmi-cloud-update-password-request-schema.json
   - type: JSONSchema
@@ -138,17 +138,6 @@ apis:
     url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
   - type: JSONSchema
     url: json-schema/gmi-cloud-auth-token-response-schema.json
-- aid: gmi-cloud:sandbox-api
-  name: GMI Sandbox API
-  description: Create, connect to, execute commands in and manage files of isolated
-    sandboxes and their templates/builds.
-  humanURL: https://docs.gmicloud.ai/api-reference/sandbox/overview
-  baseURL: https://console.gmicloud.ai/api/v2
-  tags:
-  - GMI Cloud
-  properties:
-  - type: OpenAPI
-    url: openapi/gmi-cloud-sandbox-openapi.yml
   - type: JSONSchema
     url: json-schema/gmi-cloud-create-template-request-schema.json
   - type: JSONSchema
@@ -161,15 +150,811 @@ apis:
     url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
   - type: JSONSchema
     url: json-schema/gmi-cloud-update-template-request-schema.json
-- aid: gmi-cloud:inference-api
-  name: GMI Cloud Inference Engine API
-  description: OpenAI-compatible inference endpoints (GET /v1/models, POST /v1/chat/completions)
-    plus video inference; no machine-readable contract published.
-  humanURL: https://docs.gmicloud.ai/inference-engine/api-reference/llm-api-reference
-  baseURL: https://api.gmi-serving.com/v1
+- aid: gmi-cloud:gmi-cloud-containers-api
+  name: GMI Cloud Containers API
+  description: >-
+    GMI Container management APIs for creating, managing, and monitoring containerized applications.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
   tags:
-  - GMI Cloud
-  properties: []
+  - containers
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-containers-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-elastic-ips-api
+  name: GMI Cloud Elastic Ips API
+  description: >-
+    GMI Elastic IP address management APIs for allocating, associating, and managing public IP addresses.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - elastic-ips
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-elastic-ips-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-firewalls-api
+  name: GMI Cloud Firewalls API
+  description: The firewalls API from GMI Cloud — 4 operation(s) for firewalls.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - firewalls
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-firewalls-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-idcs-api
+  name: GMI Cloud Idcs API
+  description: The idcs API from GMI Cloud — 1 operation(s) for idcs.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - idcs
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-idcs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-images-api
+  name: GMI Cloud Images API
+  description: GMI Image management APIs for query OS images.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - images
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-images-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-invitations-api
+  name: GMI Cloud Invitations API
+  description: The invitations API from GMI Cloud — 1 operation(s) for invitations.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - invitations
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-invitations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-logs-api
+  name: GMI Cloud Logs API
+  description: The logs API from GMI Cloud — 1 operation(s) for logs.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - logs
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-logs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-me-api
+  name: GMI Cloud Me API
+  description: The me API from GMI Cloud — 9 operation(s) for me.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - me
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-me-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-oauth-api
+  name: GMI Cloud OAuth API
+  description: The oauth API from GMI Cloud — 1 operation(s) for oauth.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - oauth
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-oauth-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-organizations-api
+  name: GMI Cloud Organizations API
+  description: The organizations API from GMI Cloud — 8 operation(s) for organizations.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - organizations
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-organizations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-sandbox-api
+  name: GMI Cloud Sandbox API
+  description: Sandbox instance lifecycle management (Sandbox v2, /api/v2/sandboxes)
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - Sandbox
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-sandbox-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-sandbox-exec-api
+  name: GMI Cloud Sandbox Exec API
+  description: >-
+    Sandbox execution data plane (accessed via the sandbox host and sandbox access token). These endpoints
+    are not under the control plane's `/api/v2` path; clients connect directly to `https://{sandbox_key}.{domain}`
+    and authenticate with `X-Access-Token`.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - Sandbox-Exec
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-sandbox-exec-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-sandbox-files-api
+  name: GMI Cloud Sandbox Files API
+  description: >-
+    Sandbox file data plane (`/files`). **These endpoints are not under `/api/v2`** and do not use `Authorization:
+    Bearer`: they are served by the sandbox's own data-plane entry point — clients connect directly to
+    `https://{sandbox_key}.{domain}` and authenticate with `X-Access-Token`. `{sandbox_key}` is the `sandbox_key`
+    returned by the create/connect endpoints, used for data-plane host addressing. `{domain}` and `X-Access-Token`
+    are the `domain` and `sandbox_access_token` from the same responses — no extra endpoint is needed
+    to obtain them.
+
+
+    This split is not historical baggage but the nature of a data plane: file transfer is long-lived,
+    high-volume, and addressed per sandbox, differing from the control plane's short requests in both
+    capacity model and failure domain, so they do not share an entry point.
+
+
+    **One unified abstraction.** The same contract is served by two backend kinds (an in-sandbox file
+    service / a data-center data-plane proxy); clients need not — and cannot — tell them apart. The cost
+    is that the contract is their intersection: `Content-Length` on download and resumable download (`Range`/`206`)
+    are **optional capabilities** that vary by data center, and clients must work correctly when they
+    are absent. See the per-operation notes below.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - Sandbox-Files
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-sandbox-files-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-sandboxtemplate-api
+  name: GMI Cloud Sandbox Template API
+  description: Sandbox template management (Sandbox v2, `/api/v2/templates`)
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - SandboxTemplate
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-sandboxtemplate-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-templates-api
+  name: GMI Cloud Templates API
+  description: GMI template management APIs for creating and managing reusable container template.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - templates
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-templates-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-users-api
+  name: GMI Cloud Users API
+  description: The users API from GMI Cloud — 4 operation(s) for users.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - users
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-users-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
+- aid: gmi-cloud:gmi-cloud-vpcs-api
+  name: GMI Cloud Vpcs API
+  description: The vpcs API from GMI Cloud — 2 operation(s) for vpcs.
+  humanURL: https://docs.gmicloud.ai/api-reference/introduction
+  baseURL: https://console.gmicloud.ai/api
+  tags:
+  - vpcs
+  properties:
+  - type: OpenAPI
+    url: openapi/gmi-cloud-vpcs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-containers-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-container-config-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-baremetal-req-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-firewall-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-elastic-ipresp-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-password-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-api-key-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-oauth-auth-token-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-session-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-exchange-authorization-code-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-auth-token-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-template-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-sandbox-exec-result-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-create-sandbox-control-request-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-build-definition-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-set-sandbox-control-timeout-response-schema.json
+  - type: JSONSchema
+    url: json-schema/gmi-cloud-update-template-request-schema.json
 x-enrichment:
   date: '2026-10-13'
   status: enriched

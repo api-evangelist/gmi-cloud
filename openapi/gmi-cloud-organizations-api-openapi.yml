@@ -1,0 +1,1430 @@
+openapi: 3.2.0
+info:
+  title: IDC Service Organizations API
+  description: APIs for IDC Service.
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v1
+  description: IDC Service API
+security: []
+tags:
+- name: Organizations
+paths:
+  /organizations/{orgId}/api-keys:
+    post:
+      tags:
+      - Organizations
+      summary: Create an API key
+      description: Allows a user to generate an API key for their organization.
+      operationId: createApiKey
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      requestBody:
+        description: The API key creation request.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createApiKeyRequest'
+      responses:
+        '201':
+          description: Successfully created an API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createApiKeyResponse'
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            - [group:**request**, code:**1**]: The request body is required.
+
+            - [group:**api-key**, code:**0**]: The organization has reached the maximum number of API keys.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: name
+                      expression: required
+                      originalValue: ''
+                      reason: This field is required.
+                No request body:
+                  summary: No request body.
+                  value:
+                    group: request
+                    code: 1
+                    message: The request body is required.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**api-key**, code:**1000**]: Create API key encountered DB error.
+
+            - [group:**api-key**, code:**1200**]: Get API key list encountered DB error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Create api-key encountered DB error:
+                  summary: Create api-key encountered DB error.
+                  value:
+                    group: api-key
+                    code: 1000
+                    message: Create api-key encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/create-an-api-key.md
+    get:
+      tags:
+      - Organizations
+      summary: List API keys
+      description: 'Retrieve a list of API keys accessible by the authenticated user.
+
+        - **Organization owner/admin**: Can view all API keys within the organization.
+
+        - **Organization user**: Can only see their own API keys.'
+      operationId: listApiKeys
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      responses:
+        '200':
+          description: Successfully retrieved the list of API keys.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listApiKeysResponse'
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: orgId
+                      reason: Should be a valid UUID.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**api-key**, code:**1200**]: Get API key list encountered DB error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get API key list encountered DB error:
+                  summary: Get API key list encountered DB error.
+                  value:
+                    group: api-key
+                    code: 1200
+                    message: Get API key list encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/list-api-keys.md
+  /organizations/{orgId}/api-keys/{apiKeyId}:
+    delete:
+      tags:
+      - Organizations
+      summary: Delete an API key
+      description: 'Deletes an API key by its ID.
+
+        - **Organization owner/admin**: Can delete any API key within their organization.
+
+        - **Organization user**: Can only delete the API keys they created.'
+      operationId: deleteApiKey
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      - name: apiKeyId
+        in: path
+        schema:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        required: true
+        description: 'The API key ID.
+
+          - Must be a valid UUID.
+
+          '
+      responses:
+        '200':
+          description: Successfully deleted an API key.
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: orgId
+                      reason: Should be a valid UUID.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**api-key**, code:**1201**]: Get API key encountered DB error.
+
+            - [group:**api-key**, code:**1600**]: Delete API key encountered DB error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get API key encountered DB error:
+                  summary: Get API key encountered DB error.
+                  value:
+                    group: api-key
+                    code: 1201
+                    message: Get API key encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/delete-an-api-key.md
+  /organizations/{orgId}:
+    delete:
+      tags:
+      - Organizations
+      summary: Delete an organization
+      description: 'Deletes an organization.
+
+        - Allowed only if the organization has no users.
+
+        - Only the `organization owner` can access the API.
+
+        - The owner account will also be deleted.'
+      operationId: deleteOrganization
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      responses:
+        '200':
+          description: Successfully deleted the organization.
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: ''
+                      reason: Should be a valid UUID.
+        '409':
+          description: '- [group:**organization**, code:**10**]: Organization cannot be deleted because it still has users.
+
+            - [group:**organization**, code:**11**]: Organization cannot be deleted because it still has resources.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization cannot be deleted because it still has users:
+                  summary: Organization cannot be deleted because it still has users.
+                  value:
+                    group: organization
+                    code: 10
+                    message: Organization cannot be deleted because it still has users.
+        '500':
+          description: '- [group:**invitation**, code:**202**]: Delete invitation encountered error.
+
+            - [group:**organization**, code:**12**]: Organization resource check encounter error.
+
+            - [group:**organization**, code:**1200**]: Get organization grouping policy encountered error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:**organization**, code:**1601**]: Delete organization encountered DB error.
+
+            - [group:**session**, code:**5**]: Failed to delete session.
+
+            - [group:**user**, code:**210**]: Delete user password reset data encountered error.
+
+            - [group:**user**, code:**1200**]: Get user encountered DB error.
+
+            - [group:**user**, code:**1600**]: Delete user data encountered DB error.
+
+            - [group:**workflow**, code:**1200**]: Get workflows encountered error.
+
+            - [group:**workflow**, code:**1400**]: Send signal to workflow encountered error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization grouping policy encountered error:
+                  summary: Get organization grouping policy encountered error.
+                  value:
+                    group: organization
+                    code: 1200
+                    message: Get organization grouping policy encountered error.
+                    traces:
+                    - error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/delete-an-organization.md
+    get:
+      tags:
+      - Organizations
+      summary: Retrieve organization information
+      description: 'Retrieve information about a specific organization by its ID.
+
+        Only users within the organization can access the API.'
+      operationId: getOrganization
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      responses:
+        '200':
+          description: Successfully retrieved organization information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOrganizationInfoResponse'
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: ''
+                      reason: Should be a valid UUID.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization encountered DB error:
+                  summary: Get organization encountered DB error.
+                  value:
+                    group: organization
+                    code: 1201
+                    message: Get organization encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/retrieve-organization-information.md
+    patch:
+      tags:
+      - Organizations
+      summary: Update organization information
+      description: 'Update information about a specific organization by its ID.
+
+        - Only the `organization owner` can access the API.'
+      operationId: updateOrganizationInfo
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      requestBody:
+        description: The organization info update request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateOrganizationInfoRequest'
+      responses:
+        '200':
+          description: Successfully updated the organization info.
+        '400':
+          description: '- [group:**request**, code:**1**]: The request body is required.
+
+            - [group:**request**, code:**0**]: Invalid field in the request body.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: ''
+                      reason: Should be a valid UUID.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:**organization**, code:**1401**]: Update organization encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization encountered DB error:
+                  summary: Get organization encountered DB error.
+                  value:
+                    group: organization
+                    code: 1201
+                    message: Get organization encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/update-organization-information.md
+  /organizations/{orgId}/invitations/{invitationId}:
+    post:
+      tags:
+      - Organizations
+      summary: (DEPRECATED) Accept invitation
+      description: This API is deprecated, use POST /invitations/{invitationKey} instead. Allows user to accept an invitation to join the organization. The user will automatically leave their current organization.
+      operationId: acceptInvitation
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      - name: invitationId
+        in: path
+        schema:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        required: true
+        description: 'The invitation''s ID.
+
+          - Must be a valid UUID.
+
+          '
+      responses:
+        '200':
+          description: Successfully accepted the invitation.
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: orgId
+                      reason: Should be a valid UUID.
+        '403':
+          description: '- [group:**invitation**, code:**1**]: The user has no permission to access the invitation resources.
+
+            - [group:**invitation**, code:**2**]: The invitation has been revoked.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                The user does not have permission to access invitation resources:
+                  summary: The user has no permission to access the invitation resources.
+                  value:
+                    group: invitation
+                    code: 1
+                    message: The user does not have permission to access invitation resources.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '409':
+          description: '- [group:**organization**, code:**0**]: User already owns an organization.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                User already owns an organization:
+                  summary: The user already owns an organization.
+                  value:
+                    group: organization
+                    code: 0
+                    message: User already owns an organization.
+        '500':
+          description: '- [group:**invitation**, code:**200**]: Save invitation encountered error.
+
+            - [group:**invitation**, code:**201**]: Get invitation encountered error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:**organization**, code:**1400**]: Update organization grouping policy encountered error.
+
+            - [group:**session**, code:**3**]: Failed to save session to cache.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization encountered DB error:
+                  summary: Get organization encountered DB error.
+                  value:
+                    group: organization
+                    code: 1201
+                    message: Get organization encountered DB error.
+                    traces:
+                    - DB error occurred.
+      deprecated: true
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/deprecated-accept-invitation.md
+  /organizations/{orgId}/users:
+    get:
+      tags:
+      - Organizations
+      summary: List users by organization
+      description: Retrieve a list of users belonging to the specified organization. Only users within the organization can access the API.
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      responses:
+        '200':
+          description: Successfully list users by organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/listUsersByOrganizationResponse'
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: orgId
+                      reason: Should be a valid UUID.
+                No request body:
+                  summary: No request body.
+                  value:
+                    group: request
+                    code: 1
+                    message: The request body is required.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**organization**, code:**1200**]: Get organization grouping policy encountered error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:**user**, code:**1200**]: Get user encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get user encountered DB error:
+                  summary: Get user encountered DB error.
+                  value:
+                    group: user
+                    code: 1000
+                    message: Get user encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/list-users-by-organization.md
+      operationId: getOrganizationsByOrgIdUsers
+      x-operation-id-source: derived
+  /organizations:
+    post:
+      tags:
+      - Organizations
+      summary: Register an organization
+      description: Allow users to register an organization. The user will automatically leave their current organization.
+      operationId: registerOrganization
+      requestBody:
+        description: The organization registration request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/registerOrganizationRequest'
+      responses:
+        '201':
+          description: Successfully registered the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/registerOrganizationResponse'
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request body.
+
+            - [group:**request**, code:**1**]: The request body is required.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request body:
+                  summary: Invalid field in the request body.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: name
+                      expression: required
+                      originalValue: ''
+                      reason: This field is required.
+                No request body:
+                  summary: No request body.
+                  value:
+                    group: request
+                    code: 1
+                    message: The request body is required.
+        '409':
+          description: '- [group:**organization**, code:**0**]: User already owns an organization.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                User already owns an organization:
+                  summary: The user already owns an organization.
+                  value:
+                    group: organization
+                    code: 0
+                    message: User already owns an organization.
+        '500':
+          description: '- [group:**organization**, code:**1000**]: Create organization encountered DB error.
+
+            - [group:**organization**, code:**1001**]: Create organization grouping policy encountered error.
+
+            - [group:**organization**, code:**1600**]: Delete organization grouping policy encountered error.
+
+            - [group:**session**, code:**3**]: Failed to save session to cache.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Create organization encountered DB error:
+                  summary: Create organization encountered DB error.
+                  value:
+                    group: organization
+                    code: 1000
+                    message: Create organization encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/register-an-organization.md
+  /organizations/{orgId}/invitations/email:
+    post:
+      tags:
+      - Organizations
+      summary: Send invitations via email
+      description: Allows an organization admin to invite users via email.
+      operationId: sendInvitationsByEmail
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      requestBody:
+        description: The invitations request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/sendInvitationsEmailRequest'
+      responses:
+        '201':
+          description: Successfully sent the invitations.
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            - [group:**request**, code:**1**]: The request body is required.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: emails
+                      expression: required
+                      originalValue: ''
+                      reason: This field is required.
+                No request body:
+                  summary: No request body.
+                  value:
+                    group: request
+                    code: 1
+                    message: The request body is required.
+        '404':
+          description: '- [group:**organization**, code:**2**]: Organization does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 2
+                    message: Organization does not exist.
+        '409':
+          description: '- [group:**invitation**, code:**0**]: The invitee already belongs to the organization.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                The invitee already belongs to the organization:
+                  summary: The invitee already belongs to the organization.
+                  value:
+                    group: invitation
+                    code: 0
+                    message: The invitee already belongs to the organization.
+        '500':
+          description: '- [group:**email**, code:**0**]: Send email encountered error
+
+            - [group:**invitation**, code:**200**]: Save invitation encountered error.
+
+            - [group:**organization**, code:**1200**]: Get organization grouping policy encountered error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:**user**, code:**1200**]: Get user encountered DB error.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization encountered DB error:
+                  summary: Get organization encountered DB error.
+                  value:
+                    group: organization
+                    code: 1201
+                    message: Get organization encountered DB error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/send-invitations-via-email.md
+  /organizations/{orgId}/owner:
+    patch:
+      tags:
+      - Organizations
+      summary: Transfer organization ownership
+      description: 'Transfers the ownership of an organization to another user within the organization.
+
+        - Only the current **organization owner** can perform this action.
+
+        - The new owner **must be an existing member** of the organization.
+
+        - The current owner **will be demoted to a regular user** after the transfer.'
+      operationId: transferOrganizationOwner
+      parameters:
+      - $ref: '#/components/parameters/orgIdParam'
+      requestBody:
+        description: The request body for transferring ownership.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transferOrganizationOwnerRequest'
+      responses:
+        '200':
+          description: Successfully transferred the organization ownership.
+        '400':
+          description: '- [group:**request**, code:**0**]: Invalid field in the request.
+
+            - [group:**organization**, code:**4**]: User is already the owner of the organization.
+
+            - [group:**organization**, code:**5**]: User is not a member of this organization.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Invalid field in the request:
+                  summary: Invalid field in the request.
+                  value:
+                    group: request
+                    code: 0
+                    validationDetail:
+                    - field: orgId
+                      expression: uuid
+                      originalValue: orgId
+                      reason: Should be a valid UUID.
+        '404':
+          description: '- [group:**organization**, code:**0**]: Organization does not exist.
+
+            - [group:**user**, code:**1**]: User does not exist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Organization does not exist:
+                  summary: Organization does not exist.
+                  value:
+                    group: organization
+                    code: 0
+                    message: Organization does not exist.
+        '500':
+          description: '- [group:**organization**, code:**1200**]: Get organization grouping policy encountered error.
+
+            - [group:**organization**, code:**1400**]: Update organization grouping policy encountered error.
+
+            - [group:**organization**, code:**1201**]: Get organization encountered DB error.
+
+            - [group:user, code:1200]: Get user encountered DB error.
+
+            - [group:**session**, code:**3**]: Failed to save session to cache.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrStatusMsg'
+              examples:
+                Get organization grouping policy encountered error:
+                  summary: Get organization grouping policy encountered error.
+                  value:
+                    group: organization
+                    code: 1200
+                    message: Get organization grouping policy encountered error.
+                    traces:
+                    - DB error occurred.
+      security:
+      - bearerAuth: []
+      x-source: https://docs.gmicloud.ai/api-reference/organizations/transfer-organization-ownership.md
+components:
+  schemas:
+    inviteeInfo:
+      type: object
+      x-go-name: inviteeInfo
+      properties:
+        email:
+          type: string
+          description: The email address of the user to invite.
+          example: user@example.com
+          x-oapi-codegen-extra-tags:
+            binding: required,email,emailCheck
+        role:
+          type: string
+          description: The organization role assigned to the user.
+          enum:
+          - org_user
+          x-go-type: ceCommonLibTypes.IasOrganizationRole
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/ce-common-lib-go/pkg/types
+            name: ceCommonLibTypes
+          example: org_user
+          x-oapi-codegen-extra-tags:
+            binding: required,oneof=org_user
+      required:
+      - email
+      - role
+    ValidationDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the request data.
+          x-go-type-skip-optional-pointer: true
+        expression:
+          type: string
+          description: The form of violation.
+          x-go-type-skip-optional-pointer: true
+        argument:
+          type: string
+          description: The number or data to support the expression.
+          x-go-type-skip-optional-pointer: true
+        originalValue:
+          description: The original value from the request.
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          description: The reason for the validation error.
+          x-go-type-skip-optional-pointer: true
+      example:
+      - field: fieldXXX
+        expression: required
+        originalValue: ''
+        reason: This field is required.
+    getOrganizationInfoResponse:
+      type: object
+      x-go-name: getOrganizationInfoResponse
+      properties:
+        name:
+          type: string
+          description: The organization's name.
+          example: My Organization
+      required:
+      - name
+    registerOrganizationResponse:
+      type: object
+      x-go-name: registerOrganizationResponse
+      properties:
+        id:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          description: The organization's ID.
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+      required:
+      - id
+    updateOrganizationInfoRequest:
+      type: object
+      x-go-name: updateOrganizationInfoRequest
+      properties:
+        name:
+          type: string
+          description: The organization's name.
+          example: My Organization
+          x-oapi-codegen-extra-tags:
+            binding: required
+      required:
+      - name
+    createApiKeyRequest:
+      type: object
+      x-go-name: createApiKeyRequest
+      properties:
+        name:
+          type: string
+          description: The API key name.
+          example: My Service API Key
+          x-oapi-codegen-extra-tags:
+            binding: required
+        scope:
+          type: string
+          description: The API key scope. Default value is `ie_model`.
+          enum:
+          - ie_model
+          - ce_resource
+          x-go-type: ceCommonLibTypes.IasAPIKeyScope
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/ce-common-lib-go/pkg/types
+            name: ceCommonLibTypes
+          example: ie_model
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            binding: omitempty,oneof=ie_model ce_resource
+            default: ie_model
+        expiresAt:
+          type: integer
+          x-go-type: int64
+          description: 'The UNIX timestamp when API key will expire (UTC).
+
+            - Must be a UNIX timestamp in seconds and must be greater than the current time.
+
+            - If not set, the key will not expire.
+
+            '
+          example: 1738812775
+          x-oapi-codegen-extra-tags:
+            binding: omitempty,expirationTime
+      required:
+      - name
+    ErrStatusMsg:
+      type: object
+      properties:
+        group:
+          type: string
+          description: API function group\n -Will be "request" if there are invalid request parameters.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        code:
+          type: integer
+          description: The substatus error code for the API response.
+          x-oapi-codegen-extra-tags:
+            binding: required
+        message:
+          type: string
+          description: The substatus error Message for API response.
+          x-go-type-skip-optional-pointer: true
+        traces:
+          type: array
+          items:
+            type: string
+          description: The original error messages.
+          x-go-type-skip-optional-pointer: true
+        validationDetail:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationDetail'
+          description: Returned when there are invalid request paremeters(group="request")\n List of invalid fields and the reason of error.
+          x-go-type-skip-optional-pointer: true
+      example:
+        group: request
+        code: 0
+        validationDetail:
+        - field: email
+          expression: required
+          originalValue: ''
+          reason: This field is required.
+      required:
+      - group
+      - code
+    createApiKeyResponse:
+      type: object
+      x-go-name: createApiKeyResponse
+      properties:
+        key:
+          type: string
+          description: The generated API key (returned only once).
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImM2NDNh...
+      required:
+      - key
+    transferOrganizationOwnerRequest:
+      type: object
+      x-go-name: transferOrganizationOwnerRequest
+      properties:
+        newOwnerId:
+          type: string
+          description: The user ID of the new owner, who must be a current member of the organization.
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+          x-oapi-codegen-extra-tags:
+            binding: required,uuid
+      required:
+      - newOwnerId
+    registerOrganizationRequest:
+      type: object
+      x-go-name: registerOrganizationRequest
+      properties:
+        name:
+          type: string
+          description: The organization's name.
+          example: My Organization
+          x-oapi-codegen-extra-tags:
+            binding: required
+      required:
+      - name
+    listApiKeysResponse:
+      type: object
+      x-go-name: listApiKeysResponse
+      properties:
+        keys:
+          type: array
+          description: A list of API keys.
+          items:
+            $ref: '#/components/schemas/apiKeyListItem'
+      required:
+      - keys
+    apiKeyListOwnerInfo:
+      type: object
+      description: Information about the user who owns this API key.
+      properties:
+        id:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          description: The user ID.
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+        firstName:
+          type: string
+          description: The user first name.
+          example: john
+        lastName:
+          type: string
+          description: The user last name.
+          example: doe
+      required:
+      - id
+      - firstName
+      - lastName
+    apiKeyListItem:
+      type: object
+      description: Information about the API key.
+      properties:
+        id:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          description: The unique identifier for the API key.
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          description: The API key name.
+          example: My Service API Key
+        type:
+          type: string
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+          description: 'The API key type. This field is deprecated and will be removed in a future version.
+
+            Use the `scope` field instead to specify the API key''s scope.
+
+            '
+          enum:
+          - ie_model
+          x-go-type: ceCommonLibTypes.IasAPIKeyScope
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/ce-common-lib-go/pkg/types
+            name: ceCommonLibTypes
+          example: ie_model
+        scope:
+          type: string
+          description: The API key scope.
+          enum:
+          - ie_model
+          - ce_resource
+          x-go-type: ceCommonLibTypes.IasAPIKeyScope
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/ce-common-lib-go/pkg/types
+            name: ceCommonLibTypes
+          example: ie_model
+        partialKey:
+          type: string
+          description: The last 10 characters of the API key.
+          example: 3D6l27ChEA
+        createdAt:
+          type: integer
+          x-go-type: int64
+          description: The UNIX timestamp in seconds when the API key was created (UTC).
+          example: 1738812775
+        expiresAt:
+          type: integer
+          x-go-type: int64
+          description: 'The UNIX timestamp (in seconds) indicating when the API key will expire (UTC).
+
+            If the value is `-1`, the API key does not expire.
+
+            '
+          example: 1738812775
+        owner:
+          $ref: '#/components/schemas/apiKeyListOwnerInfo'
+          type: object
+      required:
+      - id
+      - name
+      - scope
+      - partialKey
+      - createdAt
+      - expiresAt
+      - owner
+    userInOrganization:
+      type: object
+      description: Information about a user and their role within the organization.
+      properties:
+        id:
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          description: The user's ID.
+          example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+        email:
+          type: string
+          description: The user's email address.
+          example: john.doe@example.com
+        firstName:
+          type: string
+          description: The user's first name.
+          example: john
+        lastName:
+          type: string
+          description: The user's last name.
+          example: doe
+        lastLoginAt:
+          type: integer
+          description: The UNIX timestamp in seconds (UTC) of the user's most recent login. (UTC).
+          format: int64
+          example: 1740557336
+        lastLoginIDP:
+          type: string
+          description: 'The identity provider used during the user''s most recent login.
+
+            - "native": Logged in with username and password.
+
+            - "google": Logged in using Google OAuth.
+
+            - "github": Logged in using GitHub OAuth.
+
+            - "hugging_face": Logged in using Hugging Face OAuth.
+
+            '
+          enum:
+          - native
+          - google
+          - github
+          - hugging_face
+          example: google
+          x-go-type: iamLibTypes.OAuthProvider
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/iam-lib-go/pkg/types
+            name: iamLibTypes
+          x-oapi-codegen-extra-tags:
+            binding: required
+        orgRole:
+          type: string
+          enum:
+          - org_owner
+          - org_user
+          x-go-type: ceCommonLibTypes.IasOrganizationRole
+          x-go-type-import:
+            path: us-central1-go.pkg.dev/gmi-cloud-cicd/go-dev/ce-common-lib-go/pkg/types
+            name: ceCommonLibTypes
+          description: The user's organization role.
+          example: org_owner
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - orgRole
+      - lastLoginAt
+      - lastLoginIDP
+    sendInvitationsEmailRequest:
+      type: object
+      x-go-name: sendInvitationsEmailRequest
+      properties:
+        invitees:
+          type: array
+          items:
+            $ref: '#/components/schemas/inviteeInfo'
+          description: List of invitees' email and role.
+          x-oapi-codegen-extra-tags:
+            binding: required,gt=0,dive
+      required:
+      - invitees
+    listUsersByOrganizationResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          description: A list of users in the specified organization.
+          items:
+            $ref: '#/components/schemas/userInOrganization'
+  parameters:
+    orgIdParam:
+      name: orgId
+      in: path
+      schema:
+        type: string
+        format: uuid
+        x-go-type: uuid.UUID
+        example: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+      required: true
+      description: 'The organization''s ID.
+
+        - Must be a valid UUID.
+
+        '
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "An access token used to authenticate a user and grant access to restricted APIs. It is issued by session APIs.\nFor status codes related to this header, refer to the \n[Common Headers Documentation](https://gmicloud.atlassian.net/wiki/spaces/CE/pages/47199534/Common+Headers#Authorization).\n"
+    bearerAPIKey:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'An API key used to authenticate a user and grant access to restricted models. It is issued by api-keys APIs.
+
+        '
+    bearerEmailVerificationToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'A token used to verify the validity of an email address.
+
+        It must be included in the Authorization header when verifying the email address.
+
+        '

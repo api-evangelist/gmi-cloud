@@ -1,0 +1,506 @@
+openapi: 3.2.0
+info:
+  contact:
+    email: support@gmicloud.ai
+  description: Cluster Engine API spec
+  title: Cluster Engine Firewalls API
+  version: 2.4.0
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api
+security:
+- bearerAuth: []
+tags:
+- name: Firewalls
+paths:
+  /v1/firewalls/{id}/associate:
+    post:
+      tags:
+      - Firewalls
+      summary: Associate firewall
+      operationId: associateFirewall
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                instances:
+                  $ref: '#/components/schemas/UuidList'
+                instanceType:
+                  default: baremetal
+                  enum:
+                  - baremetal
+                  - container
+                  type: string
+              required:
+              - instances
+              type: object
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/firewalls/associate-firewall.md
+  /v1/firewalls:
+    post:
+      tags:
+      - Firewalls
+      summary: Create firewall
+      operationId: createFirewall
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirewallCreateReq'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirewallResp'
+          description: successful
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/firewalls/create-firewall.md
+    get:
+      tags:
+      - Firewalls
+      summary: List firewalls
+      operationId: listFirewalls
+      parameters:
+      - in: query
+        name: idc
+        schema:
+          $ref: '#/components/schemas/idcName'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/FirewallResp'
+                type: array
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/firewalls/list-firewalls.md
+  /v1/firewalls/{id}:
+    delete:
+      tags:
+      - Firewalls
+      summary: Delete firewall
+      operationId: deleteFirewall
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/firewalls/delete-firewall.md
+    get:
+      tags:
+      - Firewalls
+      summary: Get firewall information by ID
+      operationId: getFirewall
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirewallResp'
+          description: successful
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/firewalls/get-firewall-information-by-id.md
+    put:
+      tags:
+      - Firewalls
+      summary: Update firewall
+      operationId: updateFirewall
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirewallUpdateReq'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FirewallResp'
+          description: successful
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/firewalls/update-firewall.md
+  /v1/firewalls/{id}/disassociate:
+    post:
+      tags:
+      - Firewalls
+      summary: Disassociate firewall
+      operationId: disassociateFirewall
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                instances:
+                  $ref: '#/components/schemas/UuidList'
+                instanceType:
+                  default: baremetal
+                  enum:
+                  - baremetal
+                  - container
+                  type: string
+              required:
+              - instances
+              type: object
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Done'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      x-source: https://docs.gmicloud.ai/api-reference/firewalls/disassociate-firewall.md
+components:
+  schemas:
+    FirewallCreateReq:
+      allOf:
+      - $ref: '#/components/schemas/FirewallUpdateReq'
+      - properties:
+          idc:
+            $ref: '#/components/schemas/idcName'
+        required:
+        - idc
+        type: object
+    UuidList:
+      items:
+        format: uuid
+        type: string
+      type: array
+    FirewallRules:
+      items:
+        oneOf:
+        - $ref: '#/components/schemas/FirewallRuleWithPortRange'
+        - $ref: '#/components/schemas/FirewallRuleWithoutPortRange'
+      type: array
+    error:
+      properties:
+        code:
+          type: integer
+          x-go-type-skip-optional-pointer: true
+        reason:
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - reason
+      type: object
+    FirewallUpdateReq:
+      properties:
+        description:
+          maxLength: 255
+          type: string
+        inboundRules:
+          $ref: '#/components/schemas/FirewallRules'
+        name:
+          maxLength: 255
+          type: string
+      required:
+      - name
+      - inboundRules
+      type: object
+    FirewallResp:
+      allOf:
+      - $ref: '#/components/schemas/FirewallCreateReq'
+      - properties:
+          assoInstances:
+            $ref: '#/components/schemas/UuidList'
+          assoContainers:
+            $ref: '#/components/schemas/UuidList'
+            description: Associated container instance IDs
+          id:
+            format: uuid
+            type: string
+          isPreset:
+            description: Whether this is a preset firewall (cannot be deleted or have rules modified)
+            type: boolean
+          orgId:
+            format: uuid
+            type: string
+          status:
+            enum:
+            - active
+            - building
+            - error
+            type: string
+        type: object
+    remoteIpPrefix:
+      description: CIDR notation
+      example: 237.84.2.178/24
+      pattern: ^[0-9]{1,3}(\.[0-9]{1,3}){3}\/[0-9]{1,2}$
+      type: string
+    FirewallRuleWithPortRange:
+      properties:
+        description:
+          maxLength: 255
+          type: string
+        portRange:
+          $ref: '#/components/schemas/portRange'
+        protocol:
+          enum:
+          - tcp
+          - udp
+          type: string
+        remoteIpPrefix:
+          $ref: '#/components/schemas/remoteIpPrefix'
+      required:
+      - protocol
+      - portRange
+      - remoteIpPrefix
+      type: object
+    portRange:
+      properties:
+        max:
+          maximum: 65535
+          minimum: 1
+          type: integer
+        min:
+          maximum: 65535
+          minimum: 1
+          type: integer
+      required:
+      - min
+      - max
+      type: object
+    errorStatusMessage:
+      example:
+        code: 0
+        group: request
+        validationDetail:
+        - expression: required
+          field: userName
+          originalValue: ''
+          reason: This field is required.
+      properties:
+        code:
+          description: The substatus error code for the API response.
+          type: integer
+        group:
+          description: API function group. Will be "request" if there are invalid request parameters.
+          type: string
+        message:
+          description: The substatus error message for the API response.
+          type: string
+        traces:
+          description: The original error messages.
+          items:
+            type: string
+          type: array
+        validationDetail:
+          items:
+            $ref: '#/components/schemas/validationDetail'
+          type: array
+      required:
+      - group
+      - code
+      type: object
+    idcName:
+      maxLength: 50
+      pattern: ^[a-zA-Z0-9._-]+$
+      type: string
+    validationDetail:
+      example:
+        expression: required
+        field: userName
+        originalValue: ''
+        reason: This field is required.
+      properties:
+        argument:
+          description: Data supporting the expression.
+          type: string
+        expression:
+          description: The form of violation.
+          type: string
+        field:
+          description: The field of the request data.
+          type: string
+        originalValue:
+          description: The original value from the request.
+          type: string
+        reason:
+          description: The reason for the validation error.
+          type: string
+      type: object
+    FirewallRuleWithoutPortRange:
+      additionalProperties: false
+      properties:
+        description:
+          maxLength: 255
+          type: string
+        protocol:
+          enum:
+          - icmp
+          - any
+          type: string
+        remoteIpPrefix:
+          $ref: '#/components/schemas/remoteIpPrefix'
+      required:
+      - protocol
+      - remoteIpPrefix
+      type: object
+  responses:
+    Done:
+      content:
+        application/json:
+          example:
+            result: container 12345678-1234-2234-3234-xxxxxxxxxxxxxx has been restarted
+          schema:
+            properties:
+              result:
+                type: string
+            required:
+            - result
+            type: object
+      description: An action completed successfully
+    NotFound:
+      content:
+        application/json:
+          example:
+            reason: resource 12345678-1234-2234-3234-xxxxxxxxxxxxxx was not found
+          schema:
+            $ref: '#/components/schemas/error'
+      description: The specified resource was not found
+    ServiceUnavailable:
+      content:
+        application/json:
+          example:
+            reason: database is unavailable
+          schema:
+            $ref: '#/components/schemas/error'
+      description: a dependent service is unavailable
+    Unauthorized:
+      content:
+        application/json:
+          examples:
+            Expired access token.:
+              summary: Expired access token.
+              value:
+                code: 1
+                group: auth_verify
+                message: Expired access token.
+            Invalid access token.:
+              summary: Invalid access token.
+              value:
+                code: 0
+                group: auth_verify
+                message: Invalid access token.
+          schema:
+            $ref: '#/components/schemas/errorStatusMessage'
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+    BadRequest:
+      content:
+        application/json:
+          example:
+            reason: resources.CPU is a required property
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/error'
+            - $ref: '#/components/schemas/errorStatusMessage'
+      description: bad request
+    InternalServerError:
+      content:
+        application/json:
+          example:
+            reason: An error occurred in the kubernetes cluster
+          schema:
+            $ref: '#/components/schemas/error'
+      description: Internal Server Error
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

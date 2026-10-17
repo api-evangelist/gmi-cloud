@@ -1,0 +1,51 @@
+{
+  "provider": "gmi-cloud",
+  "sources": [
+    "gmi-cloud-cluster-engine-openapi.yml",
+    "gmi-cloud-idc-service-openapi.yml",
+    "gmi-cloud-sandbox-openapi.yml"
+  ],
+  "outputs": [
+    "gmi-cloud-baremetals-api-openapi.yml",
+    "gmi-cloud-containers-api-openapi.yml",
+    "gmi-cloud-elastic-ips-api-openapi.yml",
+    "gmi-cloud-firewalls-api-openapi.yml",
+    "gmi-cloud-images-api-openapi.yml",
+    "gmi-cloud-logs-api-openapi.yml",
+    "gmi-cloud-templates-api-openapi.yml",
+    "gmi-cloud-vpcs-api-openapi.yml",
+    "gmi-cloud-idcs-api-openapi.yml",
+    "gmi-cloud-invitations-api-openapi.yml",
+    "gmi-cloud-me-api-openapi.yml",
+    "gmi-cloud-oauth-api-openapi.yml",
+    "gmi-cloud-organizations-api-openapi.yml",
+    "gmi-cloud-users-api-openapi.yml",
+    "gmi-cloud-sandbox-api-openapi.yml",
+    "gmi-cloud-sandbox-exec-api-openapi.yml",
+    "gmi-cloud-sandbox-files-api-openapi.yml",
+    "gmi-cloud-sandboxtemplate-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/gmi-cloud-cluster-engine-openapi.yml",
+    "archived openapi/gmi-cloud-idc-service-openapi.yml",
+    "archived openapi/gmi-cloud-sandbox-openapi.yml"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "gmi-cloud-cluster-engine-openapi.yml: upgraded openapi 3.0.1 -> OpenAPI 3.2.0",
+    "gmi-cloud-cluster-engine-openapi.yml: declared missing tag: firewalls",
+    "gmi-cloud-cluster-engine-openapi.yml: declared missing tag: logs",
+    "gmi-cloud-cluster-engine-openapi.yml: declared missing tag: vpcs",
+    "gmi-cloud-idc-service-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "gmi-cloud-idc-service-openapi.yml: declared missing tag: idcs",
+    "gmi-cloud-idc-service-openapi.yml: declared missing tag: invitations",
+    "gmi-cloud-idc-service-openapi.yml: declared missing tag: me",
+    "gmi-cloud-idc-service-openapi.yml: declared missing tag: oauth",
+    "gmi-cloud-idc-service-openapi.yml: declared missing tag: organizations",
+    "gmi-cloud-idc-service-openapi.yml: declared missing tag: users",
+    "gmi-cloud-sandbox-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "apis.yml register: written (+18 apis, 19 total)"
+  ],
+  "skipped": []
+}

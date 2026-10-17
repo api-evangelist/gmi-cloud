@@ -1,0 +1,1514 @@
+openapi: 3.2.0
+info:
+  title: GMI Sandbox Sandbox Template API
+  description: 'REST API for GMI Sandbox: create isolated execution environments from templates, manage their lifecycle on the control plane, and run commands or transfer files through each sandbox''s own data plane.'
+  contact:
+    name: GMI Cloud Support
+    email: support@gmicloud.ai
+  version: '2.0'
+  x-harvested-from: Mintlify per-page OpenAPI slices on docs.gmicloud.ai/api-reference (llms.txt index), merged 2026-10-13
+servers:
+- url: https://console.gmicloud.ai/api/v2
+  description: Control plane
+security:
+- bearerAuth: []
+tags:
+- name: SandboxTemplate
+  description: Sandbox template management (Sandbox v2, `/api/v2/templates`)
+paths:
+  /templates:
+    post:
+      tags:
+      - SandboxTemplate
+      summary: Create a Template and start its initial Build
+      description: 'Creates a logical Template together with its initial Build. GMI creates
+
+        and starts the initial Build from the required `build` definition in the
+
+        same request.
+
+
+        `Idempotency-Key` is required and acts as the idempotency key because provider
+
+        creation can complete after an upstream timeout; a keyless retry would build a
+
+        second Template. Repeating the request with identical parameters replays the
+
+        same Template/Build (with `Idempotency-Replayed: true`); a different body under
+
+        the same key returns 400 `Sandbox.IdempotentParameterMismatch`; after the
+
+        Template is deleted the key answers 409 `Sandbox.IdempotentKeyConsumed`. Keys
+
+        are remembered for 24 hours. (`X-Request-ID` is trace-only and server-generated.)
+
+
+        `resources` supports two mutually exclusive forms:
+
+
+        - Preset: `{"type":"preset","product":"gmi.sandbox.x-large"}`. The
+
+        `product` value is the catalog SKU (see `GET /api/v2/products`); the
+
+        service resolves the active entry from the product catalog. Preset values are used as configured and
+
+        are not constrained by custom resource limits.
+
+        - Custom: `{"type":"custom","cpu_count":4,"memory_mb":8192,
+
+        "disk_size_mb":32768,"architecture":"x86_64"}`. All three numeric
+
+        fields are required. Custom resources are limited to 16 vCPU,
+
+        65536 MiB memory, and 65536 MiB boot disk, and must also be
+
+        representable by the selected IDC.'
+      operationId: createTemplate
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKeyRequiredParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: 'The Template record is created and immediately addressable: `GET
+
+            /templates/{id}` works right away, and a failed initial Build
+
+            leaves a rebuildable Template rather than erasing it. Build
+
+            readiness is reported by `status`, not by the status code.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateMutationAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unsupported'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/ProviderError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/create-a-template-and-start-its-initial-build.md
+    get:
+      tags:
+      - SandboxTemplate
+      summary: List Templates
+      description: 'Lists Templates visible to the authenticated organization. Results are
+
+        sorted by creation time in descending order. Provider artifact IDs are
+
+        never returned.'
+      operationId: listTemplates
+      parameters:
+      - $ref: '#/components/parameters/IdcNameQueryParam'
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: Templates were returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatePage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/list-templates.md
+  /templates/{template_id}/builds:
+    parameters:
+    - $ref: '#/components/parameters/TemplateBuildTemplateIdPathParam'
+    post:
+      tags:
+      - SandboxTemplate
+      summary: Create and start a rebuild
+      description: 'Creates a new Build from the given definition and starts it immediately.
+
+        A rebuild inherits the most recent Build''s provider and resources, so a
+
+        Template with no Build records left has nothing to inherit and returns
+
+        409. Not supported in every IDC; IDCs without rebuild support reject it with 422.'
+      operationId: createTemplateBuild
+      parameters:
+      - $ref: '#/components/parameters/IdcNameQueryParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildDefinition'
+      responses:
+        '201':
+          description: 'The Build record is created and immediately addressable via
+
+            `GET /templates/{template_id}/builds/{id}`; build progress is
+
+            reported by `status`, not by the status code.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateBuildMutation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unsupported'
+        '429':
+          $ref: '#/components/responses/QuotaExceeded'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/create-and-start-a-rebuild.md
+    get:
+      tags:
+      - SandboxTemplate
+      summary: List Template Builds
+      description: Lists immutable Build attempts in reverse chronological order.
+      operationId: listTemplateBuilds
+      parameters:
+      - $ref: '#/components/parameters/PageParam'
+      - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: Builds were returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/list-template-builds.md
+  /templates/{id}:
+    parameters:
+    - $ref: '#/components/parameters/TemplateIdPathParam'
+    - $ref: '#/components/parameters/IdcNameQueryParam'
+    delete:
+      tags:
+      - SandboxTemplate
+      summary: Delete a Template
+      description: 'Soft-deletes the Template so it disappears from tenant-visible lists.
+
+        Existing Sandboxes are not affected because their effective Template
+
+        configuration is copied at creation time.
+
+
+        GMI attempts to reclaim provider Build artifacts before completing the
+
+        logical delete. When the selected IDC cannot reclaim an artifact, the
+
+        Build remains with `artifact_state=retained` after soft-delete. When
+
+        reclaim is blocked by a dependent resource, the request fails with
+
+        `Template.HasDependents` (409) and nothing is soft-deleted.
+
+
+        Deletion is also rejected while a Build is in progress, and when
+
+        GMI-tracked dependents still reference the Template''s Builds (for
+
+        example child Templates, Snapshots, or live Sandboxes).'
+      operationId: deleteTemplate
+      responses:
+        '200':
+          description: 'Deletion completed synchronously: the Template is soft-deleted and
+
+            the provider artifact reclaim attempt has already settled. There is
+
+            nothing left to poll.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateDeletionAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/delete-a-template.md
+    get:
+      tags:
+      - SandboxTemplate
+      summary: Get a Template
+      description: Returns the logical Template and its current and latest Build references.
+      operationId: getTemplate
+      responses:
+        '200':
+          description: The Template was returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/get-a-template.md
+    patch:
+      tags:
+      - SandboxTemplate
+      summary: Update mutable Template metadata
+      description: 'Updates GMI-owned metadata only (`name`, `description`, `labels`).
+
+        IDC, source, resource specification, and existing Build definitions
+
+        are immutable. No provider call is made.
+
+
+        Renaming to a name already used by another Template in the same
+
+        organization and IDC returns 409.'
+      operationId: updateTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: The Template was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/update-mutable-template-metadata.md
+  /templates/{template_id}/builds/{id}:
+    parameters:
+    - $ref: '#/components/parameters/TemplateBuildTemplateIdPathParam'
+    - $ref: '#/components/parameters/BuildIdPathParam'
+    get:
+      tags:
+      - SandboxTemplate
+      summary: Get a Template Build
+      description: Returns normalized Build status and artifact availability.
+      operationId: getTemplateBuild
+      responses:
+        '200':
+          description: The Build was returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateBuildResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/ProviderError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/get-a-template-build.md
+    post:
+      tags:
+      - SandboxTemplate
+      summary: Start an existing Build
+      description: 'Starts a Build created by the split create flow (a `waiting` initial
+
+        Build). This is an action on an existing record — nothing new is
+
+        created — so success is a 202 acceptance; poll the Build for the
+
+        outcome. Starting a Build that already started returns 409. Not
+
+        supported in every IDC; unsupported IDCs reject it with 422.'
+      operationId: startTemplateBuild
+      parameters:
+      - $ref: '#/components/parameters/IdcNameQueryParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildDefinition'
+      responses:
+        '202':
+          description: The start instruction was accepted; the Build is now building.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateBuildMutation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unsupported'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/start-an-existing-build.md
+  /templates/{template_id}/builds/{id}/logs:
+    parameters:
+    - $ref: '#/components/parameters/TemplateBuildTemplateIdPathParam'
+    - $ref: '#/components/parameters/BuildIdPathParam'
+    get:
+      tags:
+      - SandboxTemplate
+      summary: Get live Template Build logs
+      description: 'Queries the underlying provider''s Build log API. GMI does not persist these logs.
+
+        Logs are filtered and paged by the GMI adapter because the provider returns a complete log collection.'
+      operationId: getTemplateBuildLogs
+      parameters:
+      - name: offset
+        in: query
+        description: Zero-based normalized log entry offset.
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+          default: 0
+      - name: limit
+        in: query
+        description: Maximum number of log entries to return.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+      - name: level
+        in: query
+        description: Optional normalized log level filter.
+        schema:
+          type: string
+          enum:
+          - debug
+          - info
+          - warn
+          - error
+      responses:
+        '200':
+          description: Build logs were returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildLogPageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          $ref: '#/components/responses/ArtifactReclaimed'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/ProviderError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/get-live-template-build-logs.md
+  /products:
+    get:
+      tags:
+      - SandboxTemplate
+      summary: List the product catalog (unified, tenant-facing)
+      description: 'Unified product catalog query: identity, display name, status and
+
+        resources per product. This is a config-plane read view for tenants —
+
+        it carries no inventory and no purchasability judgement; whether a
+
+        given operation may use a product is answered by that operation''s own
+
+        validation. `status` is externally two-valued: `active` /
+
+        `unavailable` (internal operational states are not exposed).
+
+
+        The contract covers all resource types; this release serves
+
+        `resource_type=sandbox` only (also the default), other values return
+
+        400.'
+      operationId: listProductCatalog
+      parameters:
+      - $ref: '#/components/parameters/IdcNameRequiredQueryParam'
+      - name: resource_type
+        in: query
+        description: Resource type to list. Only `sandbox` is served in this release.
+        schema:
+          type: string
+          enum:
+          - sandbox
+          default: sandbox
+      - name: include_unavailable
+        in: query
+        description: Include products whose status is `unavailable`.
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Product catalog entries were returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductCatalogListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-source: https://docs.gmicloud.ai/api-reference/sandboxtemplate/list-the-product-catalog-unified-tenant-facing.md
+components:
+  schemas:
+    BuildLogPageResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - data
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        data:
+          $ref: '#/components/schemas/BuildLogPage'
+    BuildTrigger:
+      type: string
+      enum:
+      - initial_build
+      - rebuild
+      - snapshot
+      description: Operation that created the Build.
+    BuildLogPage:
+      type: object
+      additionalProperties: false
+      required:
+      - entries
+      - next_offset
+      - has_more
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuildLogEntry'
+        next_offset:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Offset to use for the next request.
+        has_more:
+          type: boolean
+          description: Whether more provider log entries are currently available.
+    TemplateBuild:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - template_id
+      - trigger
+      - status
+      - artifact_state
+      - source_type
+      - resources
+      - created_at
+      properties:
+        id:
+          type: string
+          description: Immutable GMI Build identifier.
+        template_id:
+          type: string
+          description: Owning GMI Template identifier.
+        trigger:
+          $ref: '#/components/schemas/BuildTrigger'
+        status:
+          $ref: '#/components/schemas/BuildStatus'
+        artifact_state:
+          $ref: '#/components/schemas/ArtifactState'
+        source_type:
+          $ref: '#/components/schemas/BuildSourceType'
+        source:
+          type: object
+          description: Sanitized Build lineage. Provider IDs and credentials are omitted.
+          additionalProperties: true
+        resources:
+          $ref: '#/components/schemas/EffectiveResources'
+        product:
+          type:
+          - string
+          - 'null'
+          description: Catalog SKU when created from a preset; null for custom resources.
+        product_name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceSpecName'
+          description: Preset label when created from a preset; null for custom resources.
+        commands:
+          type: array
+          description: Build command strings. Empty for snapshot Builds.
+          items:
+            type: string
+        start_cmd:
+          type:
+          - string
+          - 'null'
+          description: Persisted launch command for this Build.
+        failure:
+          $ref: '#/components/schemas/BuildFailure'
+        created_at:
+          type: string
+          format: date-time
+          description: Build creation time in UTC.
+        started_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Build start time in UTC.
+        finished_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Build terminal time in UTC.
+    ArtifactState:
+      type: string
+      enum:
+      - absent
+      - unknown
+      - available
+      - reclaimed
+      - retained
+      description: 'Provider artifact availability independent of Build status.
+
+        `retained` means the Build was logically deleted but the artifact was
+
+        left in place; `reclaimed` means the artifact was hard-deleted.
+
+        '
+    ResourceSelection:
+      oneOf:
+      - $ref: '#/components/schemas/PresetResourceSelection'
+      - $ref: '#/components/schemas/CustomResourceSelection'
+      discriminator:
+        propertyName: type
+        mapping:
+          preset: '#/components/schemas/PresetResourceSelection'
+          custom: '#/components/schemas/CustomResourceSelection'
+      description: 'Resource values may be selected by catalog product SKU or supplied as a
+
+        custom configuration. Active presets use operator-managed IDC product
+
+        values without custom-resource limit validation. Only custom values
+
+        must pass the 16 vCPU / 64 GiB memory / 64 GiB boot disk limits and the
+
+        selected IDC''s representability checks.
+
+        '
+    TemplateResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - data
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        data:
+          $ref: '#/components/schemas/Template'
+    TemplateBuildResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - data
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        data:
+          $ref: '#/components/schemas/TemplateBuild'
+    BuildStatus:
+      type: string
+      enum:
+      - waiting
+      - building
+      - ready
+      - error
+      description: Normalized Template Build status.
+    CreateTemplateRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - name
+      - resources
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: ^[A-Za-z0-9_-]+$
+          description: Organization-scoped Template display name.
+        description:
+          type: string
+          maxLength: 256
+          description: Human-readable Template description.
+        idc_name:
+          type: string
+          description: 'IDC that permanently owns the Template. Optional: omitted, empty, and whitespace-only values are equivalent — the organization''s configured default data center is used (maintained by the platform administrator; the same setting used by sandbox creation). If the organization has no default configured, the request returns 400.
+
+            '
+        resources:
+          $ref: '#/components/schemas/ResourceSelection'
+        labels:
+          type: object
+          maxProperties: 64
+          description: User-defined labels used for filtering.
+          additionalProperties:
+            type: string
+            maxLength: 256
+        build:
+          allOf:
+          - $ref: '#/components/schemas/BuildDefinition'
+          description: 'Initial Build definition created and started with the Template
+
+            (combined flow, every IDC supports it). Omitting `build` selects the
+
+            split flow: the Template and a `waiting` initial Build are created
+
+            without starting anything, and the Build is started later via
+
+            `POST /templates/{template_id}/builds/{id}`. The split flow is not
+
+            supported in every IDC; unsupported IDCs reject it with 422.
+
+            '
+    CustomResourceSelection:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - cpu_count
+      - memory_mb
+      - disk_size_mb
+      properties:
+        type:
+          type: string
+          enum:
+          - custom
+        cpu_count:
+          type: integer
+          minimum: 1
+          maximum: 16
+          description: 'Requested integer vCPU count. Custom resources allow at most
+
+            16 vCPU.
+
+            '
+        memory_mb:
+          type: integer
+          minimum: 1
+          maximum: 65536
+          description: 'Requested integer memory size in MiB. Custom resources allow at
+
+            most 65536 MiB (64 GiB).
+
+            '
+        disk_size_mb:
+          type: integer
+          minimum: 1
+          maximum: 65536
+          description: 'Requested integer boot disk size in MiB. Custom resources allow at
+
+            most 65536 MiB (64 GiB).
+
+            '
+        architecture:
+          type: string
+          enum:
+          - x86_64
+          - arm64
+          default: x86_64
+          description: 'Requested CPU architecture. If omitted, x86_64 is used. The
+
+            selected IDC must support the value.
+
+            '
+    Template:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - name
+      - idc_name
+      - source_type
+      - resources
+      - latest_build_id
+      - latest_build_status
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          description: Immutable GMI Template identifier.
+        name:
+          type: string
+          description: Organization-scoped display name.
+        description:
+          type: string
+          description: Human-readable Template description.
+        idc_name:
+          type: string
+          description: Immutable owning IDC identifier.
+        source_type:
+          $ref: '#/components/schemas/BuildSourceType'
+        product:
+          type:
+          - string
+          - 'null'
+          description: Catalog SKU when created from a preset; null for custom resources.
+        product_name:
+          allOf:
+          - $ref: '#/components/schemas/ResourceSpecName'
+          description: Preset label when created from a preset; null for custom resources.
+        resources:
+          $ref: '#/components/schemas/EffectiveResources'
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        current_build_id:
+          type:
+          - string
+          - 'null'
+          description: Latest successful Build used to create new Sandboxes.
+        latest_build_id:
+          type: string
+          description: Most recently created Build, including a failed Build.
+        latest_build_status:
+          $ref: '#/components/schemas/BuildStatus'
+        rebuildable:
+          type: boolean
+          description: False for snapshot-created Templates.
+        deleted_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Logical deletion time in UTC.
+        created_at:
+          type: string
+          format: date-time
+          description: Template creation time in UTC.
+        updated_at:
+          type: string
+          format: date-time
+          description: Template update time in UTC.
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      - request_id
+      properties:
+        code:
+          type: string
+          description: Machine-readable business error code
+          example: Resource.QuotaExceeded
+        message:
+          type: string
+          description: Human-readable error description
+          example: The resource quota is not enough.
+        request_id:
+          type: string
+          description: Tracing ID
+          example: req-xxxx
+        details:
+          type: object
+          description: Field-level error details
+          additionalProperties: true
+    BuildSource:
+      oneOf:
+      - $ref: '#/components/schemas/ImageSource'
+      - $ref: '#/components/schemas/TemplateSource'
+      discriminator:
+        propertyName: type
+        mapping:
+          image: '#/components/schemas/ImageSource'
+          template: '#/components/schemas/TemplateSource'
+      description: Manual Build source. Sandbox sources use the snapshot endpoint.
+    ProductCatalogItem:
+      type: object
+      additionalProperties: false
+      required:
+      - resource_type
+      - product
+      - name
+      - status
+      - resources
+      description: 'One product catalog entry: identity, display name, externally-visible
+
+        status and effective resources. Carries no inventory and no
+
+        purchasability judgement.
+
+        '
+      properties:
+        resource_type:
+          type: string
+          enum:
+          - sandbox
+          description: Resource type of this entry. Only `sandbox` is served in this release.
+        product:
+          type: string
+          description: Catalog SKU (for example `gmi.sandbox.x-large`).
+        name:
+          type: string
+          description: Display name of the product (for sandbox, the preset label such as `SMALL`).
+        status:
+          type: string
+          enum:
+          - active
+          - unavailable
+          description: 'Externally two-valued status. `active` = on sale; `unavailable`
+
+            covers every internal non-usable state.
+
+            '
+        resources:
+          $ref: '#/components/schemas/EffectiveResources'
+    TemplateMutationAccepted:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - data
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        data:
+          type: object
+          additionalProperties: false
+          required:
+          - id
+          - build_id
+          - status
+          properties:
+            id:
+              type: string
+              description: Created GMI Template identifier.
+            build_id:
+              type: string
+              description: Created initial or snapshot Build identifier.
+            status:
+              $ref: '#/components/schemas/BuildStatus'
+    TemplateBuildMutation:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - data
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        data:
+          type: object
+          additionalProperties: false
+          required:
+          - id
+          - template_id
+          - status
+          properties:
+            id:
+              type: string
+              description: The Build this mutation created or started.
+            template_id:
+              type: string
+              description: Owning GMI Template identifier.
+            status:
+              $ref: '#/components/schemas/BuildStatus'
+    ProductCatalogListResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - data
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductCatalogItem'
+    TemplateDeletionAccepted:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - data
+      properties:
+        request_id:
+          type: string
+          description: Deletion request correlation identifier.
+        data:
+          type: object
+          additionalProperties: false
+          required:
+          - id
+          - deleted
+          properties:
+            id:
+              type: string
+              description: Logically deleted GMI Template identifier.
+            deleted:
+              type: boolean
+              enum:
+              - true
+              description: Confirms that logical deletion is complete.
+    PresetResourceSelection:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - product
+      properties:
+        type:
+          type: string
+          enum:
+          - preset
+        product:
+          type: string
+          description: 'Sandbox product specification id (catalog SKU, for example
+
+            `gmi.sandbox.x-large`).
+
+            '
+    UpdateTemplateRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      description: 'GMI-owned Template metadata patch. Omitted fields are left unchanged;
+
+        `labels` replaces the stored map wholesale when provided.
+
+        '
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: ^[A-Za-z0-9_-]+$
+          description: New organization-scoped display name.
+        description:
+          type: string
+          maxLength: 256
+          description: New human-readable description.
+        labels:
+          type: object
+          maxProperties: 64
+          description: Complete replacement of user-defined labels.
+          additionalProperties:
+            type: string
+            maxLength: 256
+    BuildDefinition:
+      type: object
+      additionalProperties: false
+      required:
+      - source
+      properties:
+        source:
+          $ref: '#/components/schemas/BuildSource'
+        commands:
+          type: array
+          maxItems: 100
+          description: Shell command strings executed sequentially during the Build.
+          items:
+            type: string
+            minLength: 1
+            maxLength: 8192
+        envs:
+          type: object
+          maxProperties: 256
+          additionalProperties:
+            type: string
+            maxLength: 32768
+          description: 'Environment variables available only during the Template Build.
+
+            They are visible to subsequent build commands/steps and are not persisted
+
+            into the resulting template artifact as sandbox runtime environment
+
+            variables. Pass runtime env when creating a Sandbox instead. Write-only:
+
+            values are never returned on Template or TemplateBuild responses.
+
+            Keys must be unique (JSON object); the server orders them
+
+            deterministically by key. Key names must match
+
+            `[A-Za-z_][A-Za-z0-9_]*`.
+
+            '
+        start_cmd:
+          type: string
+          minLength: 1
+          maxLength: 8192
+          description: 'Launch command persisted with the Build and applied when Sandboxes
+
+            created from this Template start.
+
+            '
+    TemplateSource:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - template_id
+      properties:
+        type:
+          type: string
+          enum:
+          - template
+        template_id:
+          type: string
+          description: Parent GMI Template identifier in the same IDC.
+        build_id:
+          type: string
+          description: 'Optional parent Build identifier. When omitted, the parent''s
+
+            current successful Build is used.
+
+            '
+    TemplatePage:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - total
+      - page
+      - page_size
+      - items
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        total:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Total number of matching Templates.
+        page:
+          type: integer
+          minimum: 1
+          description: One-based page number.
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Requested number of Templates per page.
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Template'
+    BuildFailure:
+      type:
+      - object
+      - 'null'
+      additionalProperties: false
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: Stable GMI failure code.
+          example: TemplateBuild.OutOfMemory
+        message:
+          type: string
+          description: Sanitized failure message.
+    ImageSource:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - image
+      properties:
+        type:
+          type: string
+          enum:
+          - image
+        image:
+          type: string
+          minLength: 1
+          description: 'Debian or Ubuntu container image reference. The server validates
+
+            the image against the IDC-supported base OS policy.
+
+            '
+    BuildLogEntry:
+      type: object
+      additionalProperties: false
+      required:
+      - offset
+      - level
+      - message
+      properties:
+        offset:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Normalized zero-based log entry offset.
+        timestamp:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Provider-reported log time in UTC when available.
+        level:
+          type: string
+          enum:
+          - debug
+          - info
+          - warn
+          - error
+          description: Normalized log level.
+        message:
+          type: string
+          description: Sanitized provider log message.
+    ResourceSpecName:
+      type: string
+      enum:
+      - X_SMALL
+      - SMALL
+      - MEDIUM
+      - LARGE
+      - X_LARGE
+      description: Stable human-readable Sandbox resource specification label.
+    BuildSourceType:
+      type: string
+      enum:
+      - image
+      - template
+      - sandbox
+      description: Provider-neutral Build lineage type.
+    EffectiveResources:
+      type: object
+      additionalProperties: false
+      required:
+      - cpu_count
+      - memory_mb
+      - disk_size_mb
+      - architecture
+      properties:
+        cpu_count:
+          type: integer
+          minimum: 1
+          description: 'Effective integer vCPU count. Operator-managed presets do not use
+
+            the custom-resource maximum.
+
+            '
+        memory_mb:
+          type: integer
+          minimum: 1
+          description: 'Effective memory size in MiB. Operator-managed presets are not
+
+            constrained by custom-resource limits.
+
+            '
+        disk_size_mb:
+          type: integer
+          minimum: 1
+          description: 'Effective boot disk size in MiB. Operator-managed presets are not
+
+            constrained by custom-resource limits.
+
+            '
+        architecture:
+          type: string
+          enum:
+          - x86_64
+          - arm64
+          description: 'CPU architecture resolved for the selected IDC.
+
+            '
+    BuildPage:
+      type: object
+      additionalProperties: false
+      required:
+      - request_id
+      - total
+      - page
+      - page_size
+      - items
+      properties:
+        request_id:
+          type: string
+          description: HTTP request correlation identifier.
+        total:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Total number of Build attempts for the Template.
+        page:
+          type: integer
+          minimum: 1
+          description: One-based page number.
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Requested number of Builds per page.
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateBuild'
+  parameters:
+    TemplateIdPathParam:
+      name: id
+      in: path
+      required: true
+      description: GMI Template identifier.
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKeyRequiredParam:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: 'Caller-generated key that makes the mutation safe to retry (a UUID is
+
+        recommended). Matched byte-for-byte: 1-64 printable ASCII characters,
+
+        no whitespace. The same key with a different request body returns 400
+
+        Sandbox.IdempotentParameterMismatch. Echoed on responses; replays add
+
+        Idempotency-Replayed: true. Keys are remembered for 24 hours.
+
+        '
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 64
+    IdcNameRequiredQueryParam:
+      name: idc_name
+      in: query
+      required: true
+      description: IDC identifier used for capability and resource resolution.
+      schema:
+        type: string
+    BuildIdPathParam:
+      name: id
+      in: path
+      required: true
+      description: GMI Template Build identifier.
+      schema:
+        type: string
+        format: uuid
+    PageParam:
+      name: page
+      in: query
+      description: Page number, starting from 1; default 1
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    TemplateBuildTemplateIdPathParam:
+      name: template_id
+      in: path
+      required: true
+      description: Owning GMI Template identifier.
+      schema:
+        type: string
+        format: uuid
+    PageSizeParam:
+      name: page_size
+      in: query
+      description: Items per page; default 20, maximum 100
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    IdcNameQueryParam:
+      name: idc_name
+      in: query
+      description: Filter by data center name, e.g. us-denver-1
+      schema:
+        type: string
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: Resource.NotFound
+            message: The requested resource was not found
+            request_id: req-xxxx
+    Unsupported:
+      description: 'The request is valid but the selected IDC or provider does not support
+
+        the requested capability or resolved resource specification.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ProviderError:
+      description: The selected Sandbox provider is unavailable or returned an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: Auth.Unauthorized
+            message: Authentication required
+            request_id: req-xxxx
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: Parameter.Invalid
+            message: Invalid request parameters
+            request_id: req-xxxx
+    ArtifactReclaimed:
+      description: The provider artifact and its live logs are no longer available.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: State conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: Resource.StateConflict
+            message: Resource state conflict
+            request_id: req-xxxx
+    QuotaExceeded:
+      description: The configured or temporary resource quota would be exceeded.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: Internal.ServerError
+            message: An internal server error occurred
+            request_id: req-xxxx
+    Forbidden:
+      description: The caller cannot access the organization-scoped resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API Key or Access Token, always sent as `Authorization: Bearer <token>`. The gateway recognizes the token type automatically.
+
+        '
+    sandboxAccessToken:
+      type: apiKey
+      in: header
+      name: X-Access-Token
+      description: 'Sandbox data-plane token — the `sandbox_access_token` returned by the create/connect endpoints. Used for `/files`, Sandbox-Exec, and other data-plane endpoints; the control plane (`/api/v2`) does not accept it, and conversely the control plane''s `Authorization: Bearer` is invalid on the data plane.
+
+
+        The token is bound to its sandbox: using sandbox A''s token against sandbox B''s host fails. It stays valid until the sandbox''s lifetime ends; there is no separate rotation endpoint (`rotate_traffic_token` rotates the port traffic token `traffic_access_token` and does not affect this one).
+
+        '
