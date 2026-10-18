@@ -16,6 +16,15 @@ created: '2026-10-13'
 modified: '2026-10-13'
 tags:
 - Company
+- Artificial Intelligence
+- Inference
+- GPU Cloud
+- LLM
+- Model Routing
+- Sandbox
+- Infrastructure
+tags_raw:
+- Company
 - AI
 - Inference
 - GPU Cloud
@@ -157,6 +166,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Containers
+  tags_raw:
   - containers
   properties:
   - type: OpenAPI
@@ -204,6 +215,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Elastic IPs
+  tags_raw:
   - elastic-ips
   properties:
   - type: OpenAPI
@@ -250,6 +263,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Firewalls
+  tags_raw:
   - firewalls
   properties:
   - type: OpenAPI
@@ -342,6 +357,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Image
+  tags_raw:
   - images
   properties:
   - type: OpenAPI
@@ -388,6 +405,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Invitations
+  tags_raw:
   - invitations
   properties:
   - type: OpenAPI
@@ -434,6 +453,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Logs
+  tags_raw:
   - logs
   properties:
   - type: OpenAPI
@@ -480,6 +501,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Me
+  tags_raw:
   - me
   properties:
   - type: OpenAPI
@@ -526,6 +549,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Authentication
+  tags_raw:
   - oauth
   properties:
   - type: OpenAPI
@@ -572,6 +597,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Organization
+  tags_raw:
   - organizations
   properties:
   - type: OpenAPI
@@ -823,6 +850,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - Templates
+  tags_raw:
   - templates
   properties:
   - type: OpenAPI
@@ -869,6 +898,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - User
+  tags_raw:
   - users
   properties:
   - type: OpenAPI
@@ -915,6 +946,8 @@ apis:
   humanURL: https://docs.gmicloud.ai/api-reference/introduction
   baseURL: https://console.gmicloud.ai/api
   tags:
+  - VPC
+  tags_raw:
   - vpcs
   properties:
   - type: OpenAPI
