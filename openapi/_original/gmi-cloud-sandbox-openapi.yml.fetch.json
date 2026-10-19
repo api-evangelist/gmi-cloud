@@ -1,0 +1,12 @@
+{
+ "url": "https://docs.gmicloud.ai/api-spec/sandbox_api.yaml",
+ "requested_url": "https://docs.gmicloud.ai/api-spec/sandbox_api.yaml",
+ "status": 200,
+ "content_type": "text/yaml",
+ "bytes": 101827,
+ "sha256": "f2b5adb2423c52b5ddf3a446e81a0440ac612282e67c085e9302498b4f95564f",
+ "fetched_at": "2026-10-19",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 0.913), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
