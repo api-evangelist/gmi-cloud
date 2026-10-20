@@ -1,5 +1,5 @@
 generated: '2026-10-13'
-method: searched
+method: none
 source:
 - https://zapier.com/apps/gmi-cloud/integrations
 - https://n8n.io/integrations/gmi-cloud/
