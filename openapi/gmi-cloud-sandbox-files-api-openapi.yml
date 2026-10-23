@@ -382,3 +382,9 @@ components:
         The token is bound to its sandbox: using sandbox A''s token against sandbox B''s host fails. It stays valid until the sandbox''s lifetime ends; there is no separate rotation endpoint (`rotate_traffic_token` rotates the port traffic token `traffic_access_token` and does not affect this one).
 
         '
+x-provenance:
+  method: harvested
+  publisher: GMI Cloud
+  source: https://docs.gmicloud.ai/api-spec/sandbox_api.yaml
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
